@@ -3,13 +3,11 @@ session_start();
 
 $pdo = new PDO('mysql:host=mysql; dbname=todo; charset=utf8', 'root', 'password');
 
-// 本来はデータベースからタスクを取得
-$sql = "SELECT tasks.contents, tasks.deadline, categories.name AS category, tasks.status FROM tasks JOIN categories ON tasks.category_id = categories.id";
+$sql = "SELECT tasks.title, tasks.contents, categories.name AS category FROM tasks JOIN categories ON tasks.category_id = categories.id";
 $statement = $pdo->prepare($sql);
 $statement->execute();
 $tasks = $statement->fetchAll(PDO::FETCH_ASSOC);
 
-$search_keyword = isset($_GET['search']) ? $_GET['search'] : '';
 ?>
 
 <!DOCTYPE html>
@@ -20,8 +18,8 @@ $search_keyword = isset($_GET['search']) ? $_GET['search'] : '';
     <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.17/dist/tailwind.min.css" rel="stylesheet">
     <title>ブログ一覧</title>
 </head>
-<body class="bg-gray-100">
 
+<body class="bg-gray-100">
 <!-- ヘッダーの表示 -->
 <header class="bg-white shadow p-4">
     <div class="container mx-auto flex justify-between items-center">
@@ -47,7 +45,7 @@ $search_keyword = isset($_GET['search']) ? $_GET['search'] : '';
     <h1 class="text-lg font-semibold">絞り込み検索</h1>
         <!-- 絞り込み検索とソート -->
         <div class="mb-4">
-            <form method="GET" action="index.php" class="flex items-center space-x-4">
+            <form method="GET" action="/index.php" class="flex items-center space-x-4">
                 <input type="text" name="search" class="p-2 border rounded" placeholder="キーワードを入力">
                 <button type="submit" class="bg-blue-500 text-white p-2 rounded">検索</button>
 
@@ -76,7 +74,7 @@ $search_keyword = isset($_GET['search']) ? $_GET['search'] : '';
 
         <!-- タスク追加ボタン -->
         <div class="mb-4">
-            <button class="bg-green-500 text-white p-2 rounded">タスクを追加</button>
+          <a href="task/create.php" class="bg-green-500 text-white p-2 rounded inline-block">タスクを追加</a>
         </div>
 
         <!-- タスク一覧 -->
