@@ -1,31 +1,15 @@
 <?php
 session_start();
 
-// データベースに接続
-$pdo = new PDO('mysql:host=mysql; dbname=blog; charset=utf8', 'root', 'password');
+$pdo = new PDO('mysql:host=mysql; dbname=todo; charset=utf8', 'root', 'password');
 
-// 検索キーワードと並び順の初期値を設定
-$search_keyword = $_GET['search'] ?? '';
-$order = $_GET['order'] ?? 'new'; // デフォルトは新しい順
+// 本来はデータベースからタスクを取得
+$sql = "SELECT tasks.contents, tasks.deadline, categories.name AS category, tasks.status FROM tasks JOIN categories ON tasks.category_id = categories.id";
+$statement = $pdo->prepare($sql);
+$statement->execute();
+$tasks = $statement->fetchAll(PDO::FETCH_ASSOC);
 
-// SQLクエリの準備
-$sql = "SELECT id, title, LEFT(contents, 15) AS short_contents, created_at FROM blogs";
-$placeholders = [];
-
-if ($search_keyword) {
-    $sql .= " WHERE title LIKE :search OR contents LIKE :search";
-    $placeholders[':search'] = '%' . $search_keyword . '%';
-}
-
-if ($order === 'new') {
-    $sql .= " ORDER BY created_at DESC";
-} elseif ($order === 'old') {
-    $sql .= " ORDER BY created_at ASC";
-}
-
-$stmt = $pdo->prepare($sql);
-$stmt->execute($placeholders);
-$blogs = $stmt->fetchAll(PDO::FETCH_ASSOC);
+$search_keyword = isset($_GET['search']) ? $_GET['search'] : '';
 ?>
 
 <!DOCTYPE html>
@@ -58,7 +42,70 @@ $blogs = $stmt->fetchAll(PDO::FETCH_ASSOC);
     </div>
 </header>
 
-</main>
+    <!-- メインコンテンツ -->
+    <main class="container mx-auto mt-4 p-4">
+    <h1 class="text-lg font-semibold">絞り込み検索</h1>
+        <!-- 絞り込み検索とソート -->
+        <div class="mb-4">
+            <form method="GET" action="index.php" class="flex items-center space-x-4">
+                <input type="text" name="search" class="p-2 border rounded" placeholder="キーワードを入力">
+                <button type="submit" class="bg-blue-500 text-white p-2 rounded">検索</button>
 
-</body>
-</html>
+          <!-- ソートボタン -->
+          <div>
+              <input type="radio" id="new" name="order" value="new" class="form-radio">
+              <label for="new" class="mr-2">新しい順</label>
+              <br>
+              <input type="radio" id="old" name="order" value="old" class="form-radio">
+              <label for="old">古い順</label>
+          </div>
+              <!-- カテゴリ検索 -->
+              <select name="category" class="p-2 border rounded">
+                  <option value="">カテゴリ</option>
+                  <!-- ここにPHPでカテゴリを動的に生成 -->
+              </select>
+              <!-- 完了未完了 -->
+          <div>
+            <input type="radio" id="complete" name="status" value="complete" class="form-radio">
+            <label for="complete" class="mr-2">完了</label>
+            <br>
+            <input type="radio" id="incomplete" name="status" value="incomplete" class="form-radio">
+            <label for="incomplete">未完了</label>
+          </div>
+        </div>
+
+        <!-- タスク追加ボタン -->
+        <div class="mb-4">
+            <button class="bg-green-500 text-white p-2 rounded">タスクを追加</button>
+        </div>
+
+        <!-- タスク一覧 -->
+        <table class="min-w-full bg-white">
+            <thead>
+                <tr>
+                    <th class="text-left py-2 px-4">タスク名</th>
+                    <th class="text-left py-2 px-4">締切</th>
+                    <th class="text-left py-2 px-4">カテゴリ名</th>
+                    <th class="text-left py-2 px-4">完了/未完了</th>
+                    <th class="text-left py-2 px-4">編集</th>
+                    <th class="text-left py-2 px-4">削除</th>
+                </tr>
+            </thead>
+            <tbody>
+                <?php foreach ($tasks as $task): ?>
+                <tr>
+                    <td class="py-2 px-4"><?php echo htmlspecialchars($task['contents']); ?></td>
+                    <td class="py-2 px-4"><?php echo htmlspecialchars($task['deadline']); ?></td>
+                    <td class="py-2 px-4"><?php echo htmlspecialchars($task['category']); ?></td>
+                    <td class="py-2 px-4"><?php echo htmlspecialchars($task['status']); ?></td>
+                    <td class="py-2 px-4">
+                        <button class="bg-yellow-400 text-white p-1 rounded">編集</button>
+                    </td>
+                    <td class="py-2 px-4">
+                        <button class="bg-red-500 text-white p-1 rounded">削除</button>
+                    </td>
+                </tr>
+                <?php endforeach; ?>
+            </tbody>
+        </table>
+    </main>
