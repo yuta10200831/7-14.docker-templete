@@ -3,12 +3,49 @@ session_start();
 
 $pdo = new PDO('mysql:host=mysql; dbname=todo; charset=utf8', 'root', 'password');
 
+$search = $_GET['search'] ?? '';
+$order = $_GET['order'] ?? 'old';
+$category = $_GET['category'] ?? '';
+$status = $_GET['status'] ?? '';
+
+$whereClause = [];
+$params = [];
+
+if (!empty($search)) {
+    $whereClause[] = 'tasks.contents LIKE ?';
+    $params[] = '%' . $search . '%';
+}
+
+if (!empty($category)) {
+    $whereClause[] = 'tasks.category_id = ?';
+    $params[] = $category;
+}
+
+if ($status === 'complete') {
+    $whereClause[] = 'tasks.status = 1';
+} elseif ($status === 'incomplete') {
+    $whereClause[] = 'tasks.status = 0';
+}
+
+$orderClause = 'ORDER BY tasks.deadline';
+if ($order === 'new') {
+    $orderClause .= ' DESC';
+}
+
 $sql = "SELECT tasks.id, tasks.contents, tasks.deadline, tasks.status, categories.name AS category FROM tasks JOIN categories ON tasks.category_id = categories.id";
+
+if ($whereClause) {
+    $sql .= ' WHERE ' . implode(' AND ', $whereClause);
+}
+
+$sql .= ' ' . $orderClause;
+
 $statement = $pdo->prepare($sql);
-$statement->execute();
+$statement->execute($params);
 $tasks = $statement->fetchAll(PDO::FETCH_ASSOC);
 
 ?>
+
 
 <!DOCTYPE html>
 <html lang="ja">
