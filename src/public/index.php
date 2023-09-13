@@ -3,7 +3,7 @@ session_start();
 
 $pdo = new PDO('mysql:host=mysql; dbname=todo; charset=utf8', 'root', 'password');
 
-$sql = "SELECT tasks.contents, tasks.deadline, categories.name AS category FROM tasks JOIN categories ON tasks.category_id = categories.id";
+$sql = "SELECT tasks.id, tasks.contents, tasks.deadline, tasks.status, categories.name AS category FROM tasks JOIN categories ON tasks.category_id = categories.id";
 $statement = $pdo->prepare($sql);
 $statement->execute();
 $tasks = $statement->fetchAll(PDO::FETCH_ASSOC);
@@ -57,10 +57,19 @@ $tasks = $statement->fetchAll(PDO::FETCH_ASSOC);
               <label for="old">古い順</label>
           </div>
               <!-- カテゴリ検索 -->
-              <select name="category" class="p-2 border rounded">
-                  <option value="">カテゴリ</option>
-                  <!-- ここにPHPでカテゴリを動的に生成 -->
-              </select>
+            <select name="category" class="p-2 border rounded">
+            <option value="">カテゴリ</option>
+                <?php
+                // カテゴリ一覧を取得
+                $stmt = $pdo->query("SELECT * FROM categories");
+                $categories = $stmt->fetchAll();
+
+                foreach ($categories as $category): ?>
+                <option value="<?php echo htmlspecialchars($category['id'], ENT_QUOTES, 'UTF-8'); ?>">
+                <?php echo htmlspecialchars($category['name'], ENT_QUOTES, 'UTF-8'); ?>
+                </option>
+                <?php endforeach; ?>
+            </select>
               <!-- 完了未完了 -->
           <div>
             <input type="radio" id="complete" name="status" value="complete" class="form-radio">
@@ -94,7 +103,11 @@ $tasks = $statement->fetchAll(PDO::FETCH_ASSOC);
                     <td class="py-2 px-4"><?php echo htmlspecialchars($task['contents']); ?></td>
                     <td class="py-2 px-4"><?php echo htmlspecialchars($task['deadline']); ?></td>
                     <td class="py-2 px-4"><?php echo htmlspecialchars($task['category']); ?></td>
-                    <td class="py-2 px-4"><?php echo htmlspecialchars($task['status']); ?></td>
+                    <td class="py-2 px-4">
+                        <a href="task/updateStatus.php?id=<?php echo $task['id']; ?>&status=<?php echo $task['status']; ?>" class="bg-blue-500 text-white p-1 rounded">
+                            <?php echo $task['status'] == 0 ? '未完了' : '完了'; ?>
+                        </a>
+                    </td>
                     <td class="py-2 px-4">
                         <button class="bg-yellow-400 text-white p-1 rounded">編集</button>
                     </td>
