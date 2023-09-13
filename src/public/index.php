@@ -146,10 +146,10 @@ $tasks = $statement->fetchAll(PDO::FETCH_ASSOC);
                         </a>
                     </td>
                     <td class="py-2 px-4">
-                        <button class="bg-yellow-400 text-white p-1 rounded">編集</button>
+                    <a href="task/edit.php?id=<?php echo $task['id']; ?>" class="bg-yellow-400 text-white p-1 rounded">編集</a>
                     </td>
                     <td class="py-2 px-4">
-                        <button class="bg-red-500 text-white p-1 rounded">削除</button>
+                    <a href="task/delete.php?id=<?php echo $task['id']; ?>" class="bg-red-500 text-white p-1 rounded">削除</a>
                     </td>
                 </tr>
                 <?php endforeach; ?>
