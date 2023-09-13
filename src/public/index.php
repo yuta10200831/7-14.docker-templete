@@ -28,8 +28,7 @@ $tasks = $statement->fetchAll(PDO::FETCH_ASSOC);
         </div>
         <div>
             <a href="/" class="mx-2 text-blue-500 hover:text-blue-700">ホーム</a>
-            <!-- 後程遷移先を指定 -->
-            <a href="/" class="mx-2 text-blue-500 hover:text-blue-700">カテゴリ一覧</a>
+            <a href="category/index.php" class="mx-2 text-blue-500 hover:text-blue-700">カテゴリ一覧</a>
             <?php if (isset($_SESSION["username"])): ?>
                 <!-- 後程遷移先を指定 -->
                 <a href="/" class="mx-2 text-blue-500 hover:text-blue-700">ログアウト</a>
