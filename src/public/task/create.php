@@ -16,6 +16,7 @@
           <?php endif; ?>
 
         <div class="mb-4">
+            <a href="/category/index.php" class="text-center mt-4 text-blue-500 hover:text-blue-700 underline">カテゴリを追加</a>
             <label class="block text-sm font-bold mb-2">カテゴリを選んで下さい</label>
             <select name="category_id" class="border p-2 rounded w-full">
             <?php
