@@ -1,28 +1,3 @@
-<?php
-
-$error_message = "";
-
-if ($_SERVER["REQUEST_METHOD"] == "POST") {
-  $title = $_POST['title'] ?? '';
-  $contents = $_POST['contents'] ?? '';
-  $category_id = $_POST['category_id'] ?? null;
-
-  if (empty($title) || empty($contents)) {
-      $error_message = "タイトルか内容の入力がありません";
-      return;
-  }
-
-  $pdo = new PDO('mysql:host=mysql; dbname=todo; charset=utf8', 'root', 'password');
-  $stmt = $pdo->prepare("INSERT INTO tasks (title, contents, category_id) VALUES (?, ?, ?)");
-
-  $stmt->execute([$title, $contents, $category_id]);
-
-  header("Location: /index.php");
-  exit;
-}
-
-?>
-
 <!DOCTYPE html>
 <html lang="ja">
 <head>
@@ -35,15 +10,15 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 <body class="bg-gray-100 h-screen flex justify-center items-center">
   <div class="bg-white p-8 rounded-lg shadow-md w-1/2">
       <h2 class="text-2xl mb-4">新規投稿</h2>
-      <form action="create.php" method="post">
-          <?php if ($error_message): ?>
-              <p class="text-red-500 mb-2"><?php echo $error_message; ?></p>
+      <form action="store.php" method="post">
+          <?php if (!empty($_GET['error'])): ?>
+              <p class="text-red-500 mb-2"><?php echo urldecode($_GET['error']); ?></p>
           <?php endif; ?>
 
           <div class="mb-4">
               <label class="block text-sm font-bold mb-2">カテゴリを選んで下さい</label>
               <select name="category_id" class="border p-2 rounded w-full">
-                  <!-- ここにPHPでカテゴリを動的に生成 -->
+                  <!-- ここにPHPでカテゴリを生成 -->
               </select>
           </div>
 

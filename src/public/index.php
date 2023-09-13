@@ -3,7 +3,7 @@ session_start();
 
 $pdo = new PDO('mysql:host=mysql; dbname=todo; charset=utf8', 'root', 'password');
 
-$sql = "SELECT tasks.title, tasks.contents, categories.name AS category FROM tasks JOIN categories ON tasks.category_id = categories.id";
+$sql = "SELECT tasks.contents, tasks.deadline, categories.name AS category FROM tasks JOIN categories ON tasks.category_id = categories.id";
 $statement = $pdo->prepare($sql);
 $statement->execute();
 $tasks = $statement->fetchAll(PDO::FETCH_ASSOC);
