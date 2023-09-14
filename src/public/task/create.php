@@ -1,3 +1,14 @@
+<?php
+
+// データベース接続
+$pdo = new PDO('mysql:host=mysql; dbname=todo; charset=utf8', 'root', 'password');
+
+// カテゴリ一覧を取得
+$stmt = $pdo->query("SELECT * FROM categories");
+$categories = $stmt->fetchAll();
+
+?>
+
 <!DOCTYPE html>
 <html lang="ja">
 <head>
@@ -20,13 +31,6 @@
             <label class="block text-sm font-bold mb-2">カテゴリを選んで下さい</label>
             <select name="category_id" class="border p-2 rounded w-full">
             <?php
-            // データベース接続
-            $pdo = new PDO('mysql:host=mysql; dbname=todo; charset=utf8', 'root', 'password');
-
-            // カテゴリ一覧を取得
-            $stmt = $pdo->query("SELECT * FROM categories");
-            $categories = $stmt->fetchAll();
-
             foreach ($categories as $category): ?>
             <option value="<?php echo htmlspecialchars($category['id'], ENT_QUOTES, 'UTF-8'); ?>">
                 <?php echo htmlspecialchars($category['name'], ENT_QUOTES, 'UTF-8'); ?>

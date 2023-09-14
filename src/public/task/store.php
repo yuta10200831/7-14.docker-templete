@@ -2,7 +2,6 @@
 
 $error_messages = [];
 
-if ($_SERVER["REQUEST_METHOD"] == "POST") {
   $contents = $_POST['contents'] ?? '';
   $deadline = $_POST['deadline'] ?? '';
   $category_id = $_POST['category_id'] ?? null;
@@ -23,4 +22,3 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 
   header("Location: /index.php");
   exit;
-}
