@@ -1,9 +1,10 @@
 <?php
 $pdo = new PDO('mysql:host=mysql; dbname=todo; charset=utf8', 'root', 'password');
 $id = $_GET['id'] ?? null;
+$error = $_GET['error'] ?? null;
 
 if ($id === null) {
-  header('Location: /category/index.php?error=' . urlencode('IDが指定されていません'));
+  header('Location: /category/index.php?error=');
   exit;
 }
 
@@ -17,7 +18,6 @@ if (!$category) {
   exit;
 }
 ?>
-
 <!DOCTYPE html>
 <html>
 <head>
@@ -27,6 +27,11 @@ if (!$category) {
 <body class="bg-gray-100 h-screen flex flex-col items-center pt-20">
   <div class="bg-white rounded-lg shadow-lg w-1/3 p-8">
     <h1 class="text-3xl mb-4 text-center">カテゴリ編集</h1>
+
+    <!-- エラーメッセージがあれば表示 -->
+    <?php if ($error): ?>
+      <p class="text-red-500"><?php echo htmlspecialchars(urldecode($error), ENT_QUOTES, 'UTF-8'); ?></p>
+    <?php endif; ?>
 
     <form action="/category/update.php" method="post" class="mb-4">
       <input type="hidden" name="id" value="<?php echo htmlspecialchars($id, ENT_QUOTES, 'UTF-8'); ?>">

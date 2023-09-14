@@ -5,7 +5,8 @@ $id = $_POST['id'] ?? null;
 $name = $_POST['name'] ?? null;
 
 if ($id === null || empty($name)) {
-  header('Location: /category/edit.php?id=' . $id . '&error=' . urlencode('入力されていない項目があります'));
+  $errorMessage = empty($name) ? 'カテゴリ名が入力されていません' : '入力されていない項目があります';
+  header('Location: /category/edit.php?id=' . $id . '&error=' . urlencode($errorMessage));
   exit;
 }
 
@@ -16,5 +17,4 @@ $stmt->execute();
 
 header('Location: /category/index.php');
 exit;
-
 ?>
