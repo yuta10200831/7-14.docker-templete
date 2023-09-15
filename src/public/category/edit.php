@@ -38,7 +38,6 @@ if (!$category) {
       <input type="text" name="name" placeholder="カテゴリー名" value="<?php echo htmlspecialchars($category['name'], ENT_QUOTES, 'UTF-8'); ?>" class="px-4 py-2 border rounded flex-grow">
       <input type="submit" value="更新" class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded ml-4">
     </form>
-
     <a href="/category/index.php" class="bg-gray-300 hover:bg-gray-400 text-gray-800 font-bold py-2 px-4 rounded">
       戻る
     </a>

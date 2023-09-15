@@ -70,6 +70,9 @@ foreach ($categories as $category) {
         </li>
       <?php endforeach; ?>
     </ul>
+    <a href="/index.php" class="bg-gray-300 hover:bg-gray-400 text-gray-800 font-bold py-2 px-4 rounded">
+      戻る
+    </a>
   </div>
 
 </body>
