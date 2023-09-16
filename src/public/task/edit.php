@@ -1,5 +1,4 @@
 <?php
-$pdo = new PDO('mysql:host=mysql; dbname=todo; charset=utf8', 'root', 'password');
 
 $id = $_GET['id'] ?? null;
 
@@ -7,6 +6,8 @@ if ($id === null) {
     header('Location: /index.php?error=' . urlencode('IDが指定されていません'));
     exit;
 }
+
+$pdo = new PDO('mysql:host=mysql; dbname=todo; charset=utf8', 'root', 'password');
 
 // 既存のタスクデータを取得
 $stmt = $pdo->prepare("SELECT * FROM tasks WHERE id = :id");
