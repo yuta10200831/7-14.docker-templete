@@ -1,6 +1,5 @@
 <?php
 session_start();
-$pdo = new PDO('mysql:host=mysql; dbname=todo; charset=utf8', 'root', 'password');
 
 $name = $_POST['name'] ?? null;
 $email = $_POST['email'] ?? null;
@@ -18,6 +17,8 @@ if ($password !== $password_confirm) {
   header('Location: signup.php');
   exit;
 }
+
+$pdo = new PDO('mysql:host=mysql; dbname=todo; charset=utf8', 'root', 'password');
 
 $stmt = $pdo->prepare("SELECT * FROM users WHERE email = :email");
 $stmt->bindParam(':email', $email, PDO::PARAM_STR);
