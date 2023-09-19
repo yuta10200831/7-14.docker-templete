@@ -3,13 +3,11 @@ session_start();
 
 $pdo = new PDO('mysql:host=mysql; dbname=todo; charset=utf8', 'root', 'password');
 
-// 本来はデータベースからタスクを取得
-$sql = "SELECT tasks.contents, tasks.deadline, categories.name AS category, tasks.status FROM tasks JOIN categories ON tasks.category_id = categories.id";
+$sql = "SELECT tasks.id, tasks.contents, tasks.deadline, tasks.status, categories.name AS category FROM tasks JOIN categories ON tasks.category_id = categories.id";
 $statement = $pdo->prepare($sql);
 $statement->execute();
 $tasks = $statement->fetchAll(PDO::FETCH_ASSOC);
 
-$search_keyword = isset($_GET['search']) ? $_GET['search'] : '';
 ?>
 
 <!DOCTYPE html>
@@ -20,8 +18,8 @@ $search_keyword = isset($_GET['search']) ? $_GET['search'] : '';
     <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.17/dist/tailwind.min.css" rel="stylesheet">
     <title>ブログ一覧</title>
 </head>
-<body class="bg-gray-100">
 
+<body class="bg-gray-100">
 <!-- ヘッダーの表示 -->
 <header class="bg-white shadow p-4">
     <div class="container mx-auto flex justify-between items-center">
@@ -30,8 +28,7 @@ $search_keyword = isset($_GET['search']) ? $_GET['search'] : '';
         </div>
         <div>
             <a href="/" class="mx-2 text-blue-500 hover:text-blue-700">ホーム</a>
-            <!-- 後程遷移先を指定 -->
-            <a href="/" class="mx-2 text-blue-500 hover:text-blue-700">カテゴリ一覧</a>
+            <a href="category/index.php" class="mx-2 text-blue-500 hover:text-blue-700">カテゴリ一覧</a>
             <?php if (isset($_SESSION["username"])): ?>
                 <!-- 後程遷移先を指定 -->
                 <a href="/" class="mx-2 text-blue-500 hover:text-blue-700">ログアウト</a>
@@ -47,7 +44,7 @@ $search_keyword = isset($_GET['search']) ? $_GET['search'] : '';
     <h1 class="text-lg font-semibold">絞り込み検索</h1>
         <!-- 絞り込み検索とソート -->
         <div class="mb-4">
-            <form method="GET" action="index.php" class="flex items-center space-x-4">
+            <form method="GET" action="/index.php" class="flex items-center space-x-4">
                 <input type="text" name="search" class="p-2 border rounded" placeholder="キーワードを入力">
                 <button type="submit" class="bg-blue-500 text-white p-2 rounded">検索</button>
 
@@ -60,10 +57,19 @@ $search_keyword = isset($_GET['search']) ? $_GET['search'] : '';
               <label for="old">古い順</label>
           </div>
               <!-- カテゴリ検索 -->
-              <select name="category" class="p-2 border rounded">
-                  <option value="">カテゴリ</option>
-                  <!-- ここにPHPでカテゴリを動的に生成 -->
-              </select>
+            <select name="category" class="p-2 border rounded">
+            <option value="">カテゴリ</option>
+                <?php
+                // カテゴリ一覧を取得
+                $stmt = $pdo->query("SELECT * FROM categories");
+                $categories = $stmt->fetchAll();
+
+                foreach ($categories as $category): ?>
+                <option value="<?php echo htmlspecialchars($category['id'], ENT_QUOTES, 'UTF-8'); ?>">
+                <?php echo htmlspecialchars($category['name'], ENT_QUOTES, 'UTF-8'); ?>
+                </option>
+                <?php endforeach; ?>
+            </select>
               <!-- 完了未完了 -->
           <div>
             <input type="radio" id="complete" name="status" value="complete" class="form-radio">
@@ -76,7 +82,7 @@ $search_keyword = isset($_GET['search']) ? $_GET['search'] : '';
 
         <!-- タスク追加ボタン -->
         <div class="mb-4">
-            <button class="bg-green-500 text-white p-2 rounded">タスクを追加</button>
+          <a href="task/create.php" class="bg-green-500 text-white p-2 rounded inline-block">タスクを追加</a>
         </div>
 
         <!-- タスク一覧 -->
@@ -97,7 +103,11 @@ $search_keyword = isset($_GET['search']) ? $_GET['search'] : '';
                     <td class="py-2 px-4"><?php echo htmlspecialchars($task['contents']); ?></td>
                     <td class="py-2 px-4"><?php echo htmlspecialchars($task['deadline']); ?></td>
                     <td class="py-2 px-4"><?php echo htmlspecialchars($task['category']); ?></td>
-                    <td class="py-2 px-4"><?php echo htmlspecialchars($task['status']); ?></td>
+                    <td class="py-2 px-4">
+                        <a href="task/updateStatus.php?id=<?php echo $task['id']; ?>&status=<?php echo $task['status']; ?>" class="bg-blue-500 text-white p-1 rounded">
+                            <?php echo $task['status'] == 0 ? '未完了' : '完了'; ?>
+                        </a>
+                    </td>
                     <td class="py-2 px-4">
                         <button class="bg-yellow-400 text-white p-1 rounded">編集</button>
                     </td>
