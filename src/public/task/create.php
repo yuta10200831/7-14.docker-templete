@@ -1,10 +1,12 @@
 <?php
+
 // データベース接続
 $pdo = new PDO('mysql:host=mysql; dbname=todo; charset=utf8', 'root', 'password');
 
 // カテゴリ一覧を取得
 $stmt = $pdo->query("SELECT * FROM categories");
 $categories = $stmt->fetchAll();
+
 ?>
 
 <!DOCTYPE html>
@@ -17,16 +19,19 @@ $categories = $stmt->fetchAll();
 </head>
 <body class="bg-gray-100 h-screen flex justify-center items-center">
   <div class="bg-white p-8 rounded-lg shadow-md w-1/2">
-    <h2 class="text-2xl mb-4">新規投稿</h2>
-    <form action="store.php" method="post">
-      <?php if (!empty($_GET['error'])): ?>
-        <p class="text-red-500 mb-2"><?php echo urldecode($_GET['error']); ?></p>
-      <?php endif; ?>
-      <div class="mb-4">
-        <a href="/category/index.php" class="text-center mt-4 text-blue-500 hover:text-blue-700 underline">カテゴリを追加</a>
-        <label class="block text-sm font-bold mb-2">カテゴリを選んで下さい</label>
-        <select name="category_id" class="border p-2 rounded w-full">
-          <?php foreach ($categories as $category): ?>
+      <h2 class="text-2xl mb-4">新規投稿</h2>
+      <form action="store.php" method="post">
+          <?php if (!empty($_GET['error'])): ?>
+              <p class="text-red-500 mb-2"><?php echo urldecode($_GET['error']); ?></p>
+          <?php endif; ?>
+
+        <div class="mb-4">
+            <a href="/category/index.php" class="text-center mt-4 text-blue-500 hover:text-blue-700 underline">カテゴリを追加</a>
+            <label class="block text-sm font-bold mb-2">カテゴリを選んで下さい</label>
+            <select name="category_id" class="border p-2 rounded w-full">
+            <?php
+            foreach ($categories as $category): ?>
+
             <option value="<?php echo htmlspecialchars($category['id'], ENT_QUOTES, 'UTF-8'); ?>">
                 <?php echo htmlspecialchars($category['name'], ENT_QUOTES, 'UTF-8'); ?>
             </option>

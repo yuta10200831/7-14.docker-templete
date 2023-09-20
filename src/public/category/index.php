@@ -10,6 +10,16 @@ if (isset($_GET['error'])) {
 // カテゴリ一覧取得
 $stmt = $pdo->query("SELECT * FROM categories");
 $categories = $stmt->fetchAll();
+
+// カテゴリがタスクで使われているかチェック
+$category_usage = [];
+foreach ($categories as $category) {
+    $stmt = $pdo->prepare("SELECT COUNT(*) FROM tasks WHERE category_id = :category_id");
+    $stmt->bindParam(':category_id', $category['id'], PDO::PARAM_INT);
+    $stmt->execute();
+    $count = $stmt->fetchColumn();
+    $category_usage[$category['id']] = $count > 0;
+}
 ?>
 
 <!DOCTYPE html>
@@ -48,16 +58,21 @@ $categories = $stmt->fetchAll();
               編集
             </a>
 
-            <!-- 削除ボタン -->
-            <a href="/category/delete.php?id=<?php echo $category['id']; ?>" class="bg-red-500 hover:bg-red-700 text-white font-bold py-1 px-2 rounded">
-              削除
-            </a>
+            <?php if (!$category_usage[$category['id']]): ?>
+              <!-- 削除ボタン -->
+              <a href="/category/delete.php?id=<?php echo $category['id']; ?>" class="bg-red-500 hover:bg-red-700 text-white font-bold py-1 px-2 rounded">
+                削除
+              </a>
+            <?php else: ?>
+              <span class="text-red-500">現在タスクで使用されているので削除できません</span>
+            <?php endif; ?>
           </div>
         </li>
       <?php endforeach; ?>
-      <a href="/task/create.php" class="bg-gray-300 hover:bg-gray-400 text-gray-800 font-bold py-2 px-4 rounded">戻る</a>
-
     </ul>
+    <a href="/index.php" class="bg-gray-300 hover:bg-gray-400 text-gray-800 font-bold py-2 px-4 rounded">
+      戻る
+    </a>
   </div>
 
 </body>
