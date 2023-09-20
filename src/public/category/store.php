@@ -14,6 +14,7 @@ $error_messages = [];
   if (!empty($error_messages)) {
     header('Location: /category/index.php?error=' . urlencode(implode(', ', $error_messages)));
     exit;
+
 }
 
 $stmt = $pdo->prepare("INSERT INTO categories (name) VALUES (:name)");
