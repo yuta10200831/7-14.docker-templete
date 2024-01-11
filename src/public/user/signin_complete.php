@@ -1,32 +1,39 @@
 <?php
+require_once __DIR__ . '/../../vendor/autoload.php';
+use App\Infrastructure\Redirect\Redirect;
+use App\Domain\ValueObject\User\Email;
+use App\Domain\ValueObject\User\Password;
+use App\UseCase\UseCaseInput\SignInInput;
+use App\UseCase\UseCaseInteractor\SignInInteractor;
+use App\Domain\Port\IUserQuery;
+use App\Adapter\QueryService\UserQueryService;
+
 session_start();
 
-$email = $_POST['email'] ?? null;
-$password = $_POST['password'] ?? null;
+$email = filter_input(INPUT_POST, 'email');
+$password = filter_input(INPUT_POST, 'password');
 
-// 入力が不足している場合
-if (!$email || !$password) {
-  $_SESSION['error_message'] = 'パスワードとメールアドレスを入力してください';
-  header('Location: /user/signin.php');
-  exit;
+try {
+    if (empty($email) || empty($password)) {
+        throw new Exception('パスワードとメールアドレスを入力してください');
+    }
+
+    $userEmail = new Email($email);
+    $inputPassword = new Password($password);
+    $useCaseInput = new SignInInput($userEmail, $inputPassword);
+
+    $query = new UserQueryService();
+    $useCase = new SignInInteractor($useCaseInput, $queryService);
+
+    $useCaseOutput = $useCase->handler();
+
+    if (!$useCaseOutput->isSuccess()) {
+        throw new Exception($useCaseOutput->message());
+    }
+
+    Redirect::handler('../index.php');
+} catch (Exception $e) {
+    $_SESSION['errors'][] = $e->getMessage();
+    Redirect::handler('./signin.php');
 }
-
-$pdo = new PDO('mysql:host=mysql; dbname=todo; charset=utf8', 'root', 'password');
-
-$stmt = $pdo->prepare("SELECT * FROM users WHERE email = :email");
-$stmt->bindParam(':email', $email, PDO::PARAM_STR);
-$stmt->execute();
-$user = $stmt->fetch();
-
-// ユーザが存在しない、またはパスワードが一致しない場合
-if (!$user || !password_verify($password, $user['password'])) {
-  $_SESSION['error_message'] = 'メールアドレスまたはパスワードが違います';
-  header('Location: /user/signin.php');
-  exit;
-}
-
-// セッションなどでログイン状態を管理
-$_SESSION['username'] = $user['name'];
-header('Location: /index.php');
-exit;
 ?>
