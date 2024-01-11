@@ -1,5 +1,4 @@
 <?php
-session_start();
 require_once __DIR__ . '/../../vendor/autoload.php';
 
 use App\Domain\ValueObject\User\UserName;
@@ -12,6 +11,8 @@ use App\Adapter\Repository\UserRepository;
 use App\Adapter\QueryService\UserQueryService;
 use App\Domain\Port\IUserCommand;
 use App\Domain\Port\IUserQuery;
+
+session_start();
 
 $name = filter_input(INPUT_POST, 'name');
 $email = filter_input(INPUT_POST, 'email');
