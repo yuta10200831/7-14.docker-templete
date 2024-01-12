@@ -1,5 +1,6 @@
 <?php
 namespace App\Domain\ValueObject\User;
+
 use Exception;
 
 class Password {
@@ -11,6 +12,10 @@ class Password {
 
     public function getHashedValue(): string {
         return $this->hashedValue;
+    }
+
+    public function verify(string $inputPassword): bool {
+        return password_verify($inputPassword, $this->hashedValue);
     }
 }
 ?>

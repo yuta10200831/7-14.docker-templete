@@ -1,29 +1,33 @@
 <?php
-
 namespace App\UseCase\UseCaseInteractor;
 
+use App\Infrastructure\Dao\UserDao;
 use App\Adapter\QueryService\UserQueryService;
 use App\UseCase\UseCaseInput\SignInInput;
 use App\UseCase\UseCaseOutput\SignInOutput;
-use App\Domain\Port\IUserQuery;
 
-final class SignInInteractor
-{
-    private $userQueryService;
-    private $input;
+final class SignInInteractor {
+  private $userQueryService;
+  private $input;
 
-    public function __construct(SignInInput $input, IUserQuery $queryService)
-    {
-        $this->userQueryService = $queryService;
+    public function __construct(SignInInput $input) {
         $this->input = $input;
+        $this->userQueryService = new UserQueryService(new UserDao());
     }
 
-    public function handler(): SignInOutput
+    public function handle(): SignInOutput
     {
-        $user = $this->userQueryService->findByEmail($this->input->email());
-        if ($user === null || !$user->getPassword()->verify($this->input->password()->value())) {
-            return new SignInOutput(false, 'メールアドレスまたはパスワードが間違っています');
+        $email = $this->input->getEmail();
+        $inputPassword = $this->input->getPassword();
+
+        $user = $this->userQueryService->findUserByEmail($email);
+        if ($user === null) {
+            return new SignInOutput(false, 'ユーザーが見つかりません');
         }
+
+        if (!password_verify($inputPassword->getHashedValue(), $user->getPassword()->getHashedValue())) {
+          return new SignInOutput(false, 'パスワードが一致しません');
+      }
 
         $this->saveSession($user);
         return new SignInOutput(true, 'ログインしました');
@@ -33,7 +37,6 @@ final class SignInInteractor
     {
         $_SESSION['user']['id'] = $user->getId();
         $_SESSION['user']['name'] = $user->getName();
-        $_SESSION['user']['memberStatus'] = $user->isPremiumMember() ? 'プレミアム会員' : 'ノーマル会員';
     }
 }
 ?>

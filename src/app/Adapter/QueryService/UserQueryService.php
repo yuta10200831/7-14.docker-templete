@@ -11,8 +11,8 @@ use App\Domain\Port\IUserQuery;
 class UserQueryService implements IUserQuery {
     private $userDao;
 
-    public function __construct() {
-        $this->userDao = new UserDao();
+    public function __construct(UserDao $userDao) {
+        $this->userDao = $userDao;
     }
 
     public function findUserByEmail(Email $email): ?User {

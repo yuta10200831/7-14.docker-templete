@@ -5,7 +5,7 @@ use App\Domain\ValueObject\User\Email;
 use App\Domain\ValueObject\User\Password;
 use App\UseCase\UseCaseInput\SignInInput;
 use App\UseCase\UseCaseInteractor\SignInInteractor;
-use App\Domain\Port\IUserQuery;
+use App\Infrastructure\Dao\UserDao;
 use App\Adapter\QueryService\UserQueryService;
 
 session_start();
@@ -22,18 +22,20 @@ try {
     $inputPassword = new Password($password);
     $useCaseInput = new SignInInput($userEmail, $inputPassword);
 
-    $query = new UserQueryService();
-    $useCase = new SignInInteractor($useCaseInput, $queryService);
+    $userDao = new UserDao();
+    $queryService = new UserQueryService($userDao);
 
-    $useCaseOutput = $useCase->handler();
+    $interactor = new SignInInteractor($useCaseInput, $queryService);
+    $output = $interactor->handle();
 
-    if (!$useCaseOutput->isSuccess()) {
-        throw new Exception($useCaseOutput->message());
+    if (!$output->isSuccess()) {
+        throw new Exception($output->message());
     }
 
     Redirect::handler('../index.php');
 } catch (Exception $e) {
-    $_SESSION['errors'][] = $e->getMessage();
-    Redirect::handler('./signin.php');
+    $_SESSION['error_message'] = $e->getMessage();
+    header('Location: signin.php');
+    exit;
 }
 ?>
