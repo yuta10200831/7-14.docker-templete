@@ -23,6 +23,7 @@ final class SignupInteractor {
         $this->userQuery = $userQuery;
     }
 
+
     public function handle(): SignUpOutput {
         $user = $this->userQuery->findUserByEmail($this->input->getEmail());
         if ($user) {

@@ -9,8 +9,8 @@ use App\Domain\ValueObject\User\NewUser;
 class UserRepository implements IUserCommand {
     private $userDao;
 
-    public function __construct() {
-        $this->userDao = new UserDao();
+    public function __construct(UserDao $userDao) {
+        $this->userDao = $userDao;
     }
 
     public function save(User $user): void {
