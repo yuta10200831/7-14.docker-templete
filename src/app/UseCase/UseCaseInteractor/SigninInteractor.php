@@ -7,16 +7,15 @@ use App\UseCase\UseCaseInput\SignInInput;
 use App\UseCase\UseCaseOutput\SignInOutput;
 
 final class SignInInteractor {
-  private $userQueryService;
-  private $input;
+    private $userQueryService;
+    private $input;
 
-    public function __construct(SignInInput $input) {
+    public function __construct(SignInInput $input, UserQueryService $userQueryService) {
         $this->input = $input;
-        $this->userQueryService = new UserQueryService(new UserDao());
+        $this->userQueryService = $userQueryService;
     }
 
-    public function handle(): SignInOutput
-    {
+    public function handle(): SignInOutput {
         $email = $this->input->getEmail();
         $inputPassword = $this->input->getPassword();
 
@@ -25,16 +24,15 @@ final class SignInInteractor {
             return new SignInOutput(false, 'ユーザーが見つかりません');
         }
 
-        if (!password_verify($inputPassword->getHashedValue(), $user->getPassword()->getHashedValue())) {
-          return new SignInOutput(false, 'パスワードが一致しません');
-      }
+        if (!password_verify($inputPassword, $user->getPassword()->getHashedValue())) {
+            return new SignInOutput(false, 'パスワードが一致しません');
+        }
 
         $this->saveSession($user);
         return new SignInOutput(true, 'ログインしました');
     }
 
-    private function saveSession($user): void
-    {
+    private function saveSession($user): void {
         $_SESSION['user']['id'] = $user->getId();
         $_SESSION['user']['name'] = $user->getName();
     }

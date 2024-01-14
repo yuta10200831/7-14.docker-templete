@@ -1,13 +1,11 @@
 <?php
 namespace App\Adapter\QueryService;
-
 use App\Infrastructure\Dao\UserDao;
 use App\Domain\ValueObject\User\UserName;
 use App\Domain\ValueObject\User\Email;
 use App\Domain\ValueObject\User\Password;
 use App\Domain\Entity\User;
 use App\Domain\Port\IUserQuery;
-
 class UserQueryService implements IUserQuery {
     private $userDao;
 
@@ -20,7 +18,6 @@ class UserQueryService implements IUserQuery {
         if (!$userMapper) {
             return null;
         }
-
         return new User(
             new UserName($userMapper['name']),
             $email,

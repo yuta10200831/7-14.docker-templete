@@ -19,9 +19,8 @@ try {
     }
 
     $userEmail = new Email($email);
-    $inputPassword = new Password($password);
+    $inputPassword = $password;
     $useCaseInput = new SignInInput($userEmail, $inputPassword);
-
     $userDao = new UserDao();
     $queryService = new UserQueryService($userDao);
 

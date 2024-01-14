@@ -2,14 +2,13 @@
 namespace App\UseCase\UseCaseInput;
 
 use App\Domain\ValueObject\User\Email;
-use App\Domain\ValueObject\User\Password;
 
 class SignInInput
 {
     private $email;
     private $password;
 
-    public function __construct(Email $email, Password $password)
+    public function __construct(Email $email, string $password)
     {
         $this->email = $email;
         $this->password = $password;
@@ -20,7 +19,7 @@ class SignInInput
         return $this->email;
     }
 
-    public function getPassword(): Password
+    public function getPassword(): string
     {
         return $this->password;
     }
