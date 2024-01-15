@@ -18,18 +18,15 @@ session_start();
 $name = filter_input(INPUT_POST, 'name');
 $email = filter_input(INPUT_POST, 'email');
 $password = filter_input(INPUT_POST, 'password');
-$passwordConfirm = filter_input(INPUT_POST, 'passwordConfirm');
-var_dump($name, $email, $password, $passwordConfirm);
-die;
-// ガード節を使用して入力が不正な場合にリダイレクト
-if (empty($name) || empty($email) || empty($password) || empty($passwordConfirm)) {
+$confirmPassword = filter_input(INPUT_POST, 'confirmPassword');
+
+if (empty($name) || empty($email) || empty($password) || empty($confirmPassword)) {
     $_SESSION['error_message'] = '必要な情報をすべて入力してください。';
     Redirect::handler('signup.php');
     exit;
 }
 
 try {
-    // ガード節内で各バリデーションルールをチェックし、エラーメッセージを生成
     $userName = new UserName($name);
     $userEmail = new Email($email);
     $userPassword = new InputPassword($password);

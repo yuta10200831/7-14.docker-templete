@@ -16,7 +16,7 @@ class UserRepository implements IUserCommand {
     public function save(User $user): void {
         $userName = $user->getName()->value();
         $userEmail = $user->getEmail()->value();
-        $userPasswordHash = $user->getPassword()->getHashedValue();
+        $userPasswordHash = $user->password()->value();
 
         $this->userDao->createUser($userName, $userEmail, $userPasswordHash);
     }
