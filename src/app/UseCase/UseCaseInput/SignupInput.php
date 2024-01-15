@@ -2,7 +2,7 @@
 namespace App\UseCase\UseCaseInput;
 use App\Domain\ValueObject\User\UserName;
 use App\Domain\ValueObject\User\Email;
-use App\Domain\ValueObject\User\Password;
+use App\Domain\ValueObject\User\InputPassword;
 
 class SignupInput {
     private $name;
@@ -12,7 +12,7 @@ class SignupInput {
     public function __construct(
         UserName $name,
         Email $email,
-        Password $password
+        InputPassword $password
     ) {
 
         $this->name = $name;
@@ -20,20 +20,19 @@ class SignupInput {
         $this->password = $password;
     }
 
-    public function getName() {
+    public function name(): UserName
+    {
         return $this->name;
     }
 
-    public function getEmail() {
+    public function email(): Email
+    {
         return $this->email;
     }
 
-    public function getPassword() {
+    public function password(): InputPassword
+    {
         return $this->password;
-    }
-
-    public function getPasswordConfirm() {
-        return $this->passwordConfirm;
     }
 }
 ?>

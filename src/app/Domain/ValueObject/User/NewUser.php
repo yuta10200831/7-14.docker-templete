@@ -3,7 +3,7 @@ namespace App\Domain\ValueObject\User;
 
 use App\Domain\ValueObject\User\UserName;
 use App\Domain\ValueObject\User\Email;
-use App\Domain\ValueObject\User\Password;
+use App\Domain\ValueObject\User\InputPassword;
 
 final class NewUser
 {
@@ -14,7 +14,7 @@ final class NewUser
     public function __construct(
         UserName $userName,
         Email $email,
-        Password $password
+        InputPassword $password
     ) {
         $this->userName = $userName;
         $this->email = $email;
@@ -29,7 +29,7 @@ final class NewUser
         return $this->email;
     }
 
-    public function getPassword(): Password {
+    public function getPassword(): InputPassword {
         return $this->password;
     }
 }

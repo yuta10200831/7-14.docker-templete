@@ -3,14 +3,14 @@ namespace App\Domain\Entity;
 
 use App\Domain\ValueObject\User\UserName;
 use App\Domain\ValueObject\User\Email;
-use App\Domain\ValueObject\User\Password;
+use App\Domain\ValueObject\User\HashedPassword;
 
 class User {
     private $name;
     private $email;
     private $password;
 
-    public function __construct(UserName $name, Email $email, Password $password) {
+    public function __construct(UserName $name, Email $email, HashedPassword $password) {
         $this->name = $name;
         $this->email = $email;
         $this->password = $password;
@@ -24,7 +24,8 @@ class User {
         return $this->email;
     }
 
-    public function getPassword(): Password {
+    public function password(): HashedPassword
+    {
         return $this->password;
     }
 }
