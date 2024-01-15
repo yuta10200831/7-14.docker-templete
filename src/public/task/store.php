@@ -1,24 +1,59 @@
 <?php
 
-$error_messages = [];
+require_once __DIR__ . '/../../vendor/autoload.php';
+use App\Infrastructure\Redirect\Redirect;
+use App\Adapter\Repository\PostRepository;
+use App\UseCase\UseCaseInput\CreateTaskInput;
+use App\UseCase\UseCaseInteractor\CreateTaskInteractor;
+use App\Domain\ValueObject\Post\Contents;
+use App\Domain\ValueObject\Post\Deadline;
+use App\Domain\Port\IPostCommand;
 
-  $contents = $_POST['contents'] ?? '';
-  $deadline = $_POST['deadline'] ?? '';
-  $category_id = $_POST['category_id'] ?? null;
+session_start();
 
-  // バリデーション
-  if (empty($contents)) $error_messages[] = "タスク名が入力されていません";
-  if (empty($deadline)) $error_messages[] = "締切日が入力されていません";
-  if (is_null($category_id)) $error_messages[] = "カテゴリが選択されていません";
+$user_id = $_SESSION['user']['id'] ?? null;
 
-  if (!empty($error_messages)) {
-    header("Location: /task/create.php?error=" . urlencode(implode(', ', $error_messages)));
+// ログインチェック
+if (empty($user_id)) {
+    $_SESSION['error'] = "ログインが必要です";
+    header('Location: /user/signin.php');
     exit;
-  }
+}
 
-  $pdo = new PDO('mysql:host=mysql; dbname=todo; charset=utf8', 'root', 'password');
-  $stmt = $pdo->prepare("INSERT INTO tasks (contents, deadline, category_id) VALUES (?, ?, ?)");
-  $stmt->execute([$contents, $deadline, $category_id]);
+if ($_SERVER["REQUEST_METHOD"] !== "
+POST") {
+header('Location: /create.php');
+exit;
+}
 
-  header("Location: /index.php");
-  exit;
+$contents = filter_input(INPUT_POST, 'contents');
+$deadline = filter_input(INPUT_POST, 'deadline');
+
+// バリデーション
+if (empty($contents) || empty($deadline)) {
+$_SESSION['error'] = "内容または期限が入力されていません";
+header('Location: /create.php');
+exit;
+}
+
+// 登録処理
+try {
+$contents = new Contents($contents);
+$deadline = new Deadline($deadline);
+$createTaskInput = new CreateTaskInput($contents, $deadline, $user_id);
+$postRepository = new PostRepository();
+$createTaskInteractor = new CreateTaskInteractor($postRepository, $createTaskInput);
+$createTaskOutput = $createTaskInteractor->handle();
+
+if (!$createTaskOutput->isSuccess()) {
+    throw new \Exception($createTaskOutput->getMessage());
+}
+
+$_SESSION['message'] = $createTaskOutput->getMessage();
+Redirect::handler('/index.php');
+} catch (\Exception $e) {
+$_SESSION['error'] = $e->getMessage();
+header('Location: /create.php');
+exit;
+}
+?>
