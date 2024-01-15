@@ -18,33 +18,18 @@ session_start();
 $name = filter_input(INPUT_POST, 'name');
 $email = filter_input(INPUT_POST, 'email');
 $password = filter_input(INPUT_POST, 'password');
-$passwordConfirm = filter_input(INPUT_POST, 'passwordConfirm');
-var_dump($name, $email, $password, $passwordConfirm);
-die;
-// ガード節を使用して入力が不正な場合にリダイレクト
-if (empty($name) || empty($email) || empty($password) || empty($passwordConfirm)) {
+$confirmPassword = filter_input(INPUT_POST, 'confirmPassword');
+
+if (empty($name) || empty($email) || empty($password) || empty($confirmPassword)) {
     $_SESSION['error_message'] = '必要な情報をすべて入力してください。';
     Redirect::handler('signup.php');
     exit;
 }
 
 try {
-    // ガード節内で各バリデーションルールをチェックし、エラーメッセージを生成
     $userName = new UserName($name);
     $userEmail = new Email($email);
     $userPassword = new InputPassword($password);
-
-    if (mb_strlen($name) > 20) {
-        $_SESSION['error_message'] = 'ユーザー名は20文字以下でお願いします！';
-        Redirect::handler('signup.php');
-        exit;
-    }
-
-    if (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
-        $_SESSION['error_message'] = '無効なメールアドレスです。';
-        Redirect::handler('signup.php');
-        exit;
-    }
 
     if ($password !== $confirmPassword) {
         $_SESSION['error_message'] = 'パスワードが一致しません。';

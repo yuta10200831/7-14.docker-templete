@@ -23,21 +23,20 @@ final class SignupInteractor {
         $this->userQuery = $userQuery;
     }
 
-
     public function handle(): SignUpOutput {
-        $user = $this->userQuery->findUserByEmail($this->input->getEmail());
+        $user = $this->userQuery->findUserByEmail($this->input->email());
         if ($user) {
             return new SignUpOutput(false, "メールアドレスは既に使用されています");
         }
 
-        $hashedPassword = $this->input->getPassword()->hash();
+        $hashedPassword = $this->input->password()->hash();
 
         $user = new User(
-            $this->input->getName(),
-            $this->input->getEmail(),
+            $this->input->name(),
+            $this->input->email(),
             $hashedPassword
         );
-    
+
         $this->userCommand->save($user);
 
         return new SignUpOutput(true, "ユーザー登録が完了しました！");
