@@ -31,18 +31,6 @@ try {
     $userEmail = new Email($email);
     $userPassword = new InputPassword($password);
 
-    if (mb_strlen($name) > 20) {
-        $_SESSION['error_message'] = 'ユーザー名は20文字以下でお願いします！';
-        Redirect::handler('signup.php');
-        exit;
-    }
-
-    if (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
-        $_SESSION['error_message'] = '無効なメールアドレスです。';
-        Redirect::handler('signup.php');
-        exit;
-    }
-
     if ($password !== $confirmPassword) {
         $_SESSION['error_message'] = 'パスワードが一致しません。';
         Redirect::handler('signup.php');
