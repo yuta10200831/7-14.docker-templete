@@ -2,11 +2,12 @@
 require_once __DIR__ . '/../../vendor/autoload.php';
 use App\Infrastructure\Redirect\Redirect;
 use App\Domain\ValueObject\User\Email;
-use App\Domain\ValueObject\User\Password;
+use App\Domain\ValueObject\User\InputPassword;
 use App\UseCase\UseCaseInput\SignInInput;
 use App\UseCase\UseCaseInteractor\SignInInteractor;
 use App\Infrastructure\Dao\UserDao;
 use App\Adapter\QueryService\UserQueryService;
+use App\Domain\Port\IUserQuery;
 
 session_start();
 
@@ -19,7 +20,7 @@ try {
     }
 
     $userEmail = new Email($email);
-    $inputPassword = $password;
+    $inputPassword = new InputPassword($password);
     $useCaseInput = new SignInInput($userEmail, $inputPassword);
     $userDao = new UserDao();
     $queryService = new UserQueryService($userDao);
@@ -30,11 +31,10 @@ try {
     if (!$output->isSuccess()) {
         throw new Exception($output->message());
     }
-
     Redirect::handler('../index.php');
 } catch (Exception $e) {
     $_SESSION['error_message'] = $e->getMessage();
-    header('Location: signin.php');
+    Redirect::handler('./signin.php');
     exit;
 }
 ?>
