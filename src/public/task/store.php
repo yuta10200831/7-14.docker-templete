@@ -3,8 +3,8 @@
 require_once __DIR__ . '/../../vendor/autoload.php';
 use App\Infrastructure\Redirect\Redirect;
 use App\Adapter\Repository\PostRepository;
-use App\UseCase\UseCaseInput\CreateTaskInput;
-use App\UseCase\UseCaseInteractor\CreateTaskInteractor;
+use App\UseCase\UseCaseInput\CreatePostInput;
+use App\UseCase\UseCaseInteractor\CreatePostInteractor;
 use App\Domain\ValueObject\Post\Contents;
 use App\Domain\ValueObject\Post\Deadline;
 use App\Domain\Port\IPostCommand;
@@ -20,8 +20,7 @@ if (empty($user_id)) {
     exit;
 }
 
-if ($_SERVER["REQUEST_METHOD"] !== "
-POST") {
+if ($_SERVER["REQUEST_METHOD"] !== "POST") {
 header('Location: /create.php');
 exit;
 }
@@ -40,9 +39,9 @@ exit;
 try {
 $contents = new Contents($contents);
 $deadline = new Deadline($deadline);
-$createTaskInput = new CreateTaskInput($contents, $deadline, $user_id);
+$createTaskInput = new CreatePostInput($contents, $deadline, $user_id);
 $postRepository = new PostRepository();
-$createTaskInteractor = new CreateTaskInteractor($postRepository, $createTaskInput);
+$createTaskInteractor = new CreatePostInteractor($postRepository, $createTaskInput);
 $createTaskOutput = $createTaskInteractor->handle();
 
 if (!$createTaskOutput->isSuccess()) {
