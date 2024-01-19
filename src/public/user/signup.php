@@ -25,7 +25,7 @@ unset($_SESSION['error_message']);
       <input type="text" name="name" placeholder="User Name" class="px-4 py-2 border rounded mb-2 w-full">
       <input type="email" name="email" placeholder="Email" class="px-4 py-2 border rounded mb-2 w-full">
       <input type="password" name="password" placeholder="Password" class="px-4 py-2 border rounded mb-2 w-full">
-      <input type="password" name="password_confirm" placeholder="Password確認" class="px-4 py-2 border rounded mb-2 w-full">
+      <input type="password" name="confirmPassword" placeholder="Password確認" class="px-4 py-2 border rounded mb-2 w-full">
       <input type="submit" value="アカウント作成" class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded">
     </form>
 
