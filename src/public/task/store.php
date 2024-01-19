@@ -7,7 +7,9 @@ use App\UseCase\UseCaseInput\CreatePostInput;
 use App\UseCase\UseCaseInteractor\CreatePostInteractor;
 use App\Domain\ValueObject\Post\Contents;
 use App\Domain\ValueObject\Post\Deadline;
+use App\Domain\ValueObject\Category\CategoryId;
 use App\Domain\Port\IPostCommand;
+use App\Infrastructure\Dao\PostDao;
 
 session_start();
 
@@ -27,6 +29,7 @@ exit;
 
 $contents = filter_input(INPUT_POST, 'contents');
 $deadline = filter_input(INPUT_POST, 'deadline');
+$category_id_value = filter_input(INPUT_POST, 'category_id');
 
 // バリデーション
 if (empty($contents) || empty($deadline)) {
@@ -39,16 +42,18 @@ exit;
 try {
 $contents = new Contents($contents);
 $deadline = new Deadline($deadline);
-$createTaskInput = new CreatePostInput($contents, $deadline, $user_id);
-$postRepository = new PostRepository();
+$category_id = new CategoryId($category_id_value);
+$createTaskInput = new CreatePostInput($contents, $deadline, $user_id, $category_id);
+$postDao = new PostDao();
+$postRepository = new PostRepository($postDao);
 $createTaskInteractor = new CreatePostInteractor($postRepository, $createTaskInput);
 $createTaskOutput = $createTaskInteractor->handle();
 
 if (!$createTaskOutput->isSuccess()) {
-    throw new \Exception($createTaskOutput->getMessage());
+    throw new \Exception($createTaskOutput->message());
 }
 
-$_SESSION['message'] = $createTaskOutput->getMessage();
+$_SESSION['message'] = $createTaskOutput->message();
 Redirect::handler('/index.php');
 } catch (\Exception $e) {
 $_SESSION['error'] = $e->getMessage();

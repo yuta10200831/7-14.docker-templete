@@ -2,29 +2,35 @@
 
 namespace App\Domain\Entity;
 
-require_once __DIR__ . '/../../../vendor/autoload.php';
-use App\Domain\ValueObject\Post\Title;
 use App\Domain\ValueObject\Post\Contents;
+use App\Domain\ValueObject\Post\Deadline;
+use App\Domain\ValueObject\Category\CategoryId;
 
 final class Post
 {
-    private $title;
     private $contents;
+    private $deadline;
+    private $categoryId;
     private $userId;
 
-    public function __construct(Title $title, Contents $contents, string $userId)
+    public function __construct(Contents $contents, Deadline $deadline, CategoryId $categoryId, string $userId)
     {
-        $this->title = $title;
         $this->contents = $contents;
+        $this->deadline = $deadline;
+        $this->categoryId = $categoryId;
         $this->userId = $userId;
-    }
-
-    public function title(): Title {
-        return $this->title;
     }
 
     public function contents(): Contents {
         return $this->contents;
+    }
+
+    public function deadline(): Deadline {
+        return $this->deadline;
+    }
+
+    public function categoryId(): CategoryId {
+        return $this->categoryId;
     }
 
     public function userId(): string {

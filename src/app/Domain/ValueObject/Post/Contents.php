@@ -1,18 +1,22 @@
 <?php
-namespace Domain\ValueObject\Post;
+
+namespace App\Domain\ValueObject\Post;
 
 class Contents {
     private $text;
+    private $isValid;
 
     public function __construct($text) {
-        if (empty($text)) {
-            throw new InvalidArgumentException("タスクが空では登録出来ません");
-        }
-        $this->text = $text;
+        $this->isValid = !empty($text);
+        $this->text = $this->isValid ? $text : null;
     }
 
-    public function getText() {
+    public function getValue() {
         return $this->text;
+    }
+
+    public function isValid() {
+        return $this->isValid;
     }
 }
 ?>

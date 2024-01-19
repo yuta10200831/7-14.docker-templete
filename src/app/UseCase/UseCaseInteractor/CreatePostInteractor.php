@@ -6,6 +6,7 @@ use App\UseCase\UseCaseInput\CreatePostInput;
 use App\UseCase\UseCaseOutput\CreatePostOutput;
 use App\Domain\Port\IPostCommand;
 use App\Domain\Entity\Post;
+use App\Domain\ValueObject\Category\CategoryId;
 
 final class CreatePostInteractor
 {
@@ -22,9 +23,12 @@ final class CreatePostInteractor
 
     public function handle(): CreatePostOutput
     {
+        $categoryId = new CategoryId($this->input->getCategoryId());
+
         $post = new Post(
             $this->input->getContents(),
             $this->input->getDeadline(),
+            $categoryId,
             $this->input->getUserId()
         );
 

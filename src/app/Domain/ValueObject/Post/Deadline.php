@@ -1,22 +1,21 @@
 <?php
-namespace Domain\ValueObject\Post;
+namespace App\Domain\ValueObject\Post;
+
+use Exception;
 
 class Deadline {
     private $date;
 
     public function __construct($date) {
-        if (!$this->isValidDeadline($date)) {
-            throw new InvalidArgumentException("過去の日程では登録出来ません");
-        }
-        $this->date = $date;
+        $this->date = new \DateTime($date);
     }
 
-    private function isValidDeadline($date) {
-        return (new DateTime($date)) > new DateTime();
+    public function format($format) {
+        return $this->date->format($format);
     }
 
-    public function getDate() {
-        return $this->date;
+    public function getValue() {
+        return $this->date->format('Y-m-d H:i:s');
     }
 }
 ?>

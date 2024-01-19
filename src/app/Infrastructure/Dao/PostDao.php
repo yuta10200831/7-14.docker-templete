@@ -5,7 +5,6 @@ require_once __DIR__ . '/../../../vendor/autoload.php';
 use App\Domain\Entity\Post;
 use \PDO;
 
-
 final class PostDao
 {
     private $pdo;
@@ -23,15 +22,15 @@ final class PostDao
         }
     }
 
-    //DBへ登録をする
+    // DBへ登録をする
     public function save(Post $post): int
     {
         $sql = "INSERT INTO tasks (contents, deadline, category_id) VALUES (:contents, :deadline, :category_id)";
         $stmt = $this->pdo->prepare($sql);
 
-        $title = $post->title()->getValue();
         $contents = $post->contents()->getValue();
-        $user_id = $post->userId();
+        $deadline = $post->deadline()->getValue();
+        $category_id = $post->categoryId()->getValue();
 
         $stmt->bindParam(':contents', $contents);
         $stmt->bindParam(':deadline', $deadline);
