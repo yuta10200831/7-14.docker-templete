@@ -1,6 +1,5 @@
 <?php
 namespace App\Adapter\Repository;
-
 use App\Domain\Entity\User;
 use App\Domain\Port\IUserCommand;
 use App\Infrastructure\Dao\UserDao;
@@ -16,6 +15,7 @@ class UserRepository implements IUserCommand {
     public function save(User $user): void {
         $userName = $user->getName()->value();
         $userEmail = $user->getEmail()->value();
+
         $userPasswordHash = $user->password()->value();
 
         $this->userDao->createUser($userName, $userEmail, $userPasswordHash);

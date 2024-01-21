@@ -1,24 +1,63 @@
 <?php
 
-$error_messages = [];
+require_once __DIR__ . '/../../vendor/autoload.php';
+use App\Infrastructure\Redirect\Redirect;
+use App\Adapter\Repository\PostRepository;
+use App\UseCase\UseCaseInput\CreatePostInput;
+use App\UseCase\UseCaseInteractor\CreatePostInteractor;
+use App\Domain\ValueObject\Post\Contents;
+use App\Domain\ValueObject\Post\Deadline;
+use App\Domain\ValueObject\Category\CategoryId;
+use App\Domain\Port\IPostCommand;
+use App\Infrastructure\Dao\PostDao;
 
-  $contents = $_POST['contents'] ?? '';
-  $deadline = $_POST['deadline'] ?? '';
-  $category_id = $_POST['category_id'] ?? null;
+session_start();
 
-  // バリデーション
-  if (empty($contents)) $error_messages[] = "タスク名が入力されていません";
-  if (empty($deadline)) $error_messages[] = "締切日が入力されていません";
-  if (is_null($category_id)) $error_messages[] = "カテゴリが選択されていません";
+$user_id = $_SESSION['user']['id'] ?? null;
 
-  if (!empty($error_messages)) {
-    header("Location: /task/create.php?error=" . urlencode(implode(', ', $error_messages)));
+// ログインチェック
+if (empty($user_id)) {
+    $_SESSION['error'] = "ログインが必要です";
+    header('Location: /user/signin.php');
     exit;
-  }
+}
 
-  $pdo = new PDO('mysql:host=mysql; dbname=todo; charset=utf8', 'root', 'password');
-  $stmt = $pdo->prepare("INSERT INTO tasks (contents, deadline, category_id) VALUES (?, ?, ?)");
-  $stmt->execute([$contents, $deadline, $category_id]);
+if ($_SERVER["REQUEST_METHOD"] !== "POST") {
+header('Location: /create.php');
+exit;
+}
 
-  header("Location: /index.php");
-  exit;
+$contents = filter_input(INPUT_POST, 'contents');
+$deadline = filter_input(INPUT_POST, 'deadline');
+$category_id_value = filter_input(INPUT_POST, 'category_id');
+
+// バリデーション
+if (empty($contents) || empty($deadline)) {
+$_SESSION['error'] = "内容または期限が入力されていません";
+header('Location: /create.php');
+exit;
+}
+
+// 登録処理
+try {
+$contents = new Contents($contents);
+$deadline = new Deadline($deadline);
+$category_id = new CategoryId($category_id_value);
+$createTaskInput = new CreatePostInput($contents, $deadline, $user_id, $category_id);
+$postDao = new PostDao();
+$postRepository = new PostRepository($postDao);
+$createTaskInteractor = new CreatePostInteractor($postRepository, $createTaskInput);
+$createTaskOutput = $createTaskInteractor->handle();
+
+if (!$createTaskOutput->isSuccess()) {
+    throw new \Exception($createTaskOutput->message());
+}
+
+$_SESSION['message'] = $createTaskOutput->message();
+Redirect::handler('/index.php');
+} catch (\Exception $e) {
+$_SESSION['error'] = $e->getMessage();
+header('Location: /create.php');
+exit;
+}
+?>

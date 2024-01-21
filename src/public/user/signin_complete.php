@@ -1,32 +1,40 @@
 <?php
+require_once __DIR__ . '/../../vendor/autoload.php';
+use App\Infrastructure\Redirect\Redirect;
+use App\Domain\ValueObject\User\Email;
+use App\Domain\ValueObject\User\InputPassword;
+use App\UseCase\UseCaseInput\SignInInput;
+use App\UseCase\UseCaseInteractor\SignInInteractor;
+use App\Infrastructure\Dao\UserDao;
+use App\Adapter\QueryService\UserQueryService;
+use App\Domain\Port\IUserQuery;
+
 session_start();
 
-$email = $_POST['email'] ?? null;
-$password = $_POST['password'] ?? null;
+$email = filter_input(INPUT_POST, 'email');
+$password = filter_input(INPUT_POST, 'password');
 
-// 入力が不足している場合
-if (!$email || !$password) {
-  $_SESSION['error_message'] = 'パスワードとメールアドレスを入力してください';
-  header('Location: /user/signin.php');
-  exit;
+try {
+    if (empty($email) || empty($password)) {
+        throw new Exception('パスワードとメールアドレスを入力してください');
+    }
+
+    $userEmail = new Email($email);
+    $inputPassword = new InputPassword($password);
+    $useCaseInput = new SignInInput($userEmail, $inputPassword);
+    $userDao = new UserDao();
+    $queryService = new UserQueryService($userDao);
+
+    $interactor = new SignInInteractor($useCaseInput, $queryService);
+    $output = $interactor->handle();
+
+    if (!$output->isSuccess()) {
+        throw new Exception($output->message());
+    }
+    Redirect::handler('../index.php');
+} catch (Exception $e) {
+    $_SESSION['error_message'] = $e->getMessage();
+    Redirect::handler('./signin.php');
+    exit;
 }
-
-$pdo = new PDO('mysql:host=mysql; dbname=todo; charset=utf8', 'root', 'password');
-
-$stmt = $pdo->prepare("SELECT * FROM users WHERE email = :email");
-$stmt->bindParam(':email', $email, PDO::PARAM_STR);
-$stmt->execute();
-$user = $stmt->fetch();
-
-// ユーザが存在しない、またはパスワードが一致しない場合
-if (!$user || !password_verify($password, $user['password'])) {
-  $_SESSION['error_message'] = 'メールアドレスまたはパスワードが違います';
-  header('Location: /user/signin.php');
-  exit;
-}
-
-// セッションなどでログイン状態を管理
-$_SESSION['username'] = $user['name'];
-header('Location: /index.php');
-exit;
 ?>
