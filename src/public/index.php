@@ -1,51 +1,50 @@
 <?php
 session_start();
+require_once __DIR__ . '/../vendor/autoload.php';
 
-$pdo = new PDO('mysql:host=mysql; dbname=todo; charset=utf8', 'root', 'password');
+use App\Infrastructure\Dao\TaskDao;
+use App\Adapter\QueryService\TaskQueryService;
+use App\UseCase\UseCaseInteractor\TaskInteractor;
+use App\UseCase\UseCaseInput\TaskInput;
+use App\Infrastructure\Redirect\Redirect;
+use App\Domain\ValueObject\Post\Contents;
+use App\Domain\ValueObject\Post\Deadline;
+use App\Domain\ValueObject\Category\CategoryId;
+use App\Domain\ValueObject\SearchKeyword;
 
-$search = $_GET['search'] ?? '';
-$order = $_GET['order'] ?? 'old';
-$category = $_GET['category'] ?? '';
-$status = $_GET['status'] ?? '';
-
-$whereClause = [];
-$params = [];
-
-if (!empty($search)) {
-    $whereClause[] = 'tasks.contents LIKE ?';
-    $params[] = '%' . $search . '%';
+// ログインチェック
+if (!isset($_SESSION['user']['name'])) {
+    header('Location: login.php');
+    exit;
 }
 
-if (!empty($category)) {
-    $whereClause[] = 'tasks.category_id = ?';
-    $params[] = $category;
+// ユーザーIDのチェック
+if (!isset($_SESSION['user']['id'])) {
+    header('Location: create.php');
+    exit;
 }
 
-if ($status === 'complete') {
-    $whereClause[] = 'tasks.status = 1';
-} elseif ($status === 'incomplete') {
-    $whereClause[] = 'tasks.status = 0';
+try {
+    $search = $_GET['search'] ?? '';
+    $deadline = $_GET['deadline'] ?? '2020-01-01';
+    $categoryId = $_GET['category_id'] ?? 1;
+
+    $taskDao = new TaskDao();
+    $taskQueryService = new TaskQueryService($taskDao);
+    $taskInput = new TaskInput(
+        new SearchKeyword($search),
+        new Deadline($deadline),
+        new CategoryId($categoryId)
+    );
+    $taskInteractor = new TaskInteractor($taskInput, $taskQueryService);
+    $taskOutput = $taskInteractor->handle();
+    $tasks = $taskOutput->getTasks();
+} catch (Exception $e) {
+    $_SESSION['errors'][] = $e->getMessage();
+    Redirect::handler('error.php');
+    exit;
 }
-
-$orderClause = 'ORDER BY tasks.deadline';
-if ($order === 'new') {
-    $orderClause .= ' DESC';
-}
-
-$sql = "SELECT tasks.id, tasks.contents, tasks.deadline, tasks.status, categories.name AS category FROM tasks JOIN categories ON tasks.category_id = categories.id";
-
-if ($whereClause) {
-    $sql .= ' WHERE ' . implode(' AND ', $whereClause);
-}
-
-$sql .= ' ' . $orderClause;
-
-$statement = $pdo->prepare($sql);
-$statement->execute($params);
-$tasks = $statement->fetchAll(PDO::FETCH_ASSOC);
-
 ?>
-
 
 <!DOCTYPE html>
 <html lang="ja">
@@ -84,15 +83,15 @@ $tasks = $statement->fetchAll(PDO::FETCH_ASSOC);
                 <input type="text" name="search" class="p-2 border rounded" placeholder="キーワードを入力">
                 <button type="submit" class="bg-blue-500 text-white p-2 rounded">検索</button>
 
-          <!-- ソートボタン -->
-          <div>
-              <input type="radio" id="new" name="order" value="new" class="form-radio">
-              <label for="new" class="mr-2">新しい順</label>
-              <br>
-              <input type="radio" id="old" name="order" value="old" class="form-radio">
-              <label for="old">古い順</label>
-          </div>
-              <!-- カテゴリ検索 -->
+            <!-- ソートボタン -->
+            <div>
+                <input type="radio" id="new" name="order" value="new" class="form-radio">
+                <label for="new" class="mr-2">新しい順</label>
+                <br>
+                <input type="radio" id="old" name="order" value="old" class="form-radio">
+                <label for="old">古い順</label>
+            </div>
+                <!-- カテゴリ検索 -->
             <select name="category" class="p-2 border rounded">
             <option value="">カテゴリ</option>
                 <?php
@@ -106,19 +105,19 @@ $tasks = $statement->fetchAll(PDO::FETCH_ASSOC);
                 </option>
                 <?php endforeach; ?>
             </select>
-              <!-- 完了未完了 -->
-          <div>
+                <!-- 完了未完了 -->
+            <div>
             <input type="radio" id="complete" name="status" value="complete" class="form-radio">
             <label for="complete" class="mr-2">完了</label>
             <br>
             <input type="radio" id="incomplete" name="status" value="incomplete" class="form-radio">
             <label for="incomplete">未完了</label>
-          </div>
+            </div>
         </div>
 
         <!-- タスク追加ボタン -->
         <div class="mb-4">
-          <a href="task/create.php" class="bg-green-500 text-white p-2 rounded inline-block">タスクを追加</a>
+            <a href="task/create.php" class="bg-green-500 text-white p-2 rounded inline-block">タスクを追加</a>
         </div>
 
         <!-- タスク一覧 -->
@@ -134,24 +133,22 @@ $tasks = $statement->fetchAll(PDO::FETCH_ASSOC);
                 </tr>
             </thead>
             <tbody>
-                <?php foreach ($tasks as $task): ?>
-                <tr>
-                    <td class="py-2 px-4"><?php echo htmlspecialchars($task['contents']); ?></td>
-                    <td class="py-2 px-4"><?php echo htmlspecialchars($task['deadline']); ?></td>
-                    <td class="py-2 px-4"><?php echo htmlspecialchars($task['category']); ?></td>
-                    <td class="py-2 px-4">
-                        <a href="task/updateStatus.php?id=<?php echo $task['id']; ?>&status=<?php echo $task['status']; ?>" class="bg-blue-500 text-white p-1 rounded">
-                            <?php echo $task['status'] == 0 ? '未完了' : '完了'; ?>
-                        </a>
-                    </td>
-                    <td class="py-2 px-4">
-                    <a href="task/edit.php?id=<?php echo $task['id']; ?>" class="bg-yellow-400 text-white p-1 rounded">編集</a>
-                    </td>
-                    <td class="py-2 px-4">
-                    <a href="task/delete.php?id=<?php echo $task['id']; ?>" class="bg-red-500 text-white p-1 rounded">削除</a>
-                    </td>
-                </tr>
-                <?php endforeach; ?>
+            <?php foreach ($tasks as $task): ?>
+            <tr>
+                <td class="py-2 px-4"><?php echo htmlspecialchars($task->getContents()); ?></td>
+                <td class="py-2 px-4"><?php echo htmlspecialchars($task->getDeadline()->format('Y-m-d')); ?></td>
+                <td class="py-2 px-4"><?php echo htmlspecialchars($task->getCategoryId() ?? '未指定'); ?></td>
+                <td class="py-2 px-4">
+                    <?php echo $task->getStatus() === null ? '状態未定' : ($task->getStatus() == 0 ? '未完了' : '完了'); ?>
+                </td>
+                <td class="py-2 px-4">
+                    <a href="task/edit.php?id=<?php echo $task->getId(); ?>" class="bg-yellow-400 text-white p-1 rounded">編集</a>
+                </td>
+                <td class="py-2 px-4">
+                    <a href="task/delete.php?id=<?php echo $task->getId(); ?>" class="bg-red-500 text-white p-1 rounded">削除</a>
+                </td>
+            </tr>
+            <?php endforeach; ?>
             </tbody>
         </table>
     </main>
