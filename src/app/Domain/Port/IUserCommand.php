@@ -1,9 +1,8 @@
 <?php
 namespace App\Domain\Port;
 
-use App\Domain\Entity\User;
+use App\Domain\ValueObject\User\NewUser;
 
 interface IUserCommand {
-    public function save(User $user): void;
+    public function save(NewUser $newUser): void;
 }
-?>
