@@ -1,26 +1,19 @@
 <?php
 namespace App\Domain\Entity;
 
-use App\Domain\ValueObject\User\UserId;
 use App\Domain\ValueObject\User\UserName;
 use App\Domain\ValueObject\User\Email;
 use App\Domain\ValueObject\User\HashedPassword;
 
 class User {
-    private $id;
     private $name;
     private $email;
     private $password;
 
-    public function __construct(UserId $id, UserName $name, Email $email, HashedPassword $password) {
-        $this->id = $id;
+    public function __construct(UserName $name, Email $email, HashedPassword $password) {
         $this->name = $name;
         $this->email = $email;
         $this->password = $password;
-    }
-
-    public function getId(): UserId {
-        return $this->id;
     }
 
     public function getName(): UserName {
@@ -31,8 +24,8 @@ class User {
         return $this->email;
     }
 
-    public function password(): HashedPassword {
+    public function password(): HashedPassword
+    {
         return $this->password;
     }
 }
-?>
