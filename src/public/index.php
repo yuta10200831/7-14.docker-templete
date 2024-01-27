@@ -46,6 +46,8 @@ try {
 }
 ?>
 
+
+
 <!DOCTYPE html>
 <html lang="ja">
 <head>
@@ -105,7 +107,7 @@ try {
                 </option>
                 <?php endforeach; ?>
             </select>
-                <!-- 完了未完了 -->
+            <!-- 完了未完了 -->
             <div>
             <input type="radio" id="complete" name="status" value="complete" class="form-radio">
             <label for="complete" class="mr-2">完了</label>
@@ -133,22 +135,24 @@ try {
                 </tr>
             </thead>
             <tbody>
-            <?php foreach ($tasks as $task): ?>
-            <tr>
-                <td class="py-2 px-4"><?php echo htmlspecialchars($task->getContents()); ?></td>
-                <td class="py-2 px-4"><?php echo htmlspecialchars($task->getDeadline()->format('Y-m-d')); ?></td>
-                <td class="py-2 px-4"><?php echo htmlspecialchars($task->getCategoryId() ?? '未指定'); ?></td>
-                <td class="py-2 px-4">
-                    <?php echo $task->getStatus() === null ? '状態未定' : ($task->getStatus() == 0 ? '未完了' : '完了'); ?>
-                </td>
-                <td class="py-2 px-4">
-                    <a href="task/edit.php?id=<?php echo $task->getId(); ?>" class="bg-yellow-400 text-white p-1 rounded">編集</a>
-                </td>
-                <td class="py-2 px-4">
-                    <a href="task/delete.php?id=<?php echo $task->getId(); ?>" class="bg-red-500 text-white p-1 rounded">削除</a>
-                </td>
-            </tr>
-            <?php endforeach; ?>
+                <?php foreach ($tasks as $task): ?>
+                <tr>
+                    <td class="py-2 px-4"><?php echo htmlspecialchars($task['contents']); ?></td>
+                    <td class="py-2 px-4"><?php echo htmlspecialchars($task['deadline']); ?></td>
+                    <td class="py-2 px-4"><?php echo htmlspecialchars($task['category']); ?></td>
+                    <td class="py-2 px-4">
+                        <a href="task/updateStatus.php?id=<?php echo $task['id']; ?>&status=<?php echo $task['status']; ?>" class="bg-blue-500 text-white p-1 rounded">
+                            <?php echo $task['status'] == 0 ? '未完了' : '完了'; ?>
+                        </a>
+                    </td>
+                    <td class="py-2 px-4">
+                    <a href="task/edit.php?id=<?php echo $task['id']; ?>" class="bg-yellow-400 text-white p-1 rounded">編集</a>
+                    </td>
+                    <td class="py-2 px-4">
+                    <a href="task/delete.php?id=<?php echo $task['id']; ?>" class="bg-red-500 text-white p-1 rounded">削除</a>
+                    </td>
+                </tr>
+                <?php endforeach; ?>
             </tbody>
         </table>
     </main>
