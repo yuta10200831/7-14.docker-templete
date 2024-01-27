@@ -25,16 +25,18 @@ final class PostDao
     // DBへ登録をする
     public function save(Post $post): int
     {
-        $sql = "INSERT INTO tasks (contents, deadline, category_id) VALUES (:contents, :deadline, :category_id)";
+        $sql = "INSERT INTO tasks (contents, deadline, category_id, user_id) VALUES (:contents, :deadline, :category_id, :user_id)";
         $stmt = $this->pdo->prepare($sql);
 
         $contents = $post->contents()->getValue();
         $deadline = $post->deadline()->getValue();
         $category_id = $post->categoryId()->getValue();
+        $user_id = $post->userId();
 
         $stmt->bindParam(':contents', $contents);
         $stmt->bindParam(':deadline', $deadline);
         $stmt->bindParam(':category_id', $category_id);
+        $stmt->bindParam(':user_id', $user_id);
 
         $stmt->execute();
         return $this->pdo->lastInsertId();

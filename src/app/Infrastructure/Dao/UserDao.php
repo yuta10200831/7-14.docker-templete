@@ -51,4 +51,3 @@ class UserDao {
         return $this->pdo->lastInsertId();
     }
 }
-?>
