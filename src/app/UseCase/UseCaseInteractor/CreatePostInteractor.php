@@ -23,7 +23,13 @@ final class CreatePostInteractor
 
     public function handle(): CreatePostOutput
     {
-        $categoryId = new CategoryId($this->input->getCategoryId());
+        $categoryIdObj = $this->input->getCategoryId();
+
+        if ($categoryIdObj === null || !$categoryIdObj->isValid()) {
+            throw new \InvalidArgumentException("Invalid or missing category ID");
+        }
+
+        $categoryId = new CategoryId($categoryIdObj->getValue());
 
         $post = new Post(
             $this->input->getContents(),
@@ -37,4 +43,3 @@ final class CreatePostInteractor
         return new CreatePostOutput($postId, self::COMPLETED_MESSAGE);
     }
 }
-?>
