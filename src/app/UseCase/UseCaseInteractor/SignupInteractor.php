@@ -11,6 +11,8 @@ use App\Domain\Port\IUserCommand;
 use App\Domain\Port\IUserQuery;
 use App\UseCase\UseCaseInput\SignUpInput;
 use App\UseCase\UseCaseOutput\SignUpOutput;
+use App\Domain\ValueObject\User\UserId;
+use App\Domain\ValueObject\User\NewUser;
 
 final class SignupInteractor {
     private $userCommand;
@@ -24,22 +26,23 @@ final class SignupInteractor {
     }
 
     public function handle(): SignUpOutput {
-        $user = $this->userQuery->findUserByEmail($this->input->email());
-        if ($user) {
+        $existingUser = $this->userQuery->findUserByEmail($this->input->email());
+        if ($existingUser) {
             return new SignUpOutput(false, "メールアドレスは既に使用されています");
         }
 
-        $hashedPassword = $this->input->password()->hash();
+        return $this->signup();
+    }
 
-        $user = new User(
+    private function signup(): SignUpOutput {
+        $newUser = new NewUser(
             $this->input->name(),
             $this->input->email(),
-            $hashedPassword
+            $this->input->password()
         );
 
-        $this->userCommand->save($user);
+        $this->userCommand->save($newUser);
 
         return new SignUpOutput(true, "ユーザー登録が完了しました！");
     }
 }
-?>
