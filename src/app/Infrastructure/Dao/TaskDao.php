@@ -3,8 +3,8 @@
 namespace App\Infrastructure\Dao;
 
 use App\Domain\Entity\Task;
-use \PDO;
-use \Exception;
+use PDO;
+use Exception;
 
 class TaskDao {
     private $pdo;
@@ -16,7 +16,7 @@ class TaskDao {
                 'root',
                 'password'
             );
-        } catch (\PDOException $e) {
+        } catch (PDOException $e) {
             throw new Exception('DB接続エラー: ' . $e->getMessage());
         }
     }
@@ -44,12 +44,38 @@ class TaskDao {
         );
     }
 
-    public function findAllTasks(): array {
-        $sql = "SELECT * FROM tasks";
-        $stmt = $this->pdo->query($sql);
-        if (!$stmt) {
-            throw new Exception('SQL実行エラー');
+    public function findAllTasks($searchKeyword = '', $selectedCategoryId = '', $status = '', $order = 'new'): array {
+        $parameters = [];
+        $sql = "SELECT * FROM tasks WHERE 1=1";
+
+        if ($searchKeyword !== '') {
+            $sql .= " AND contents LIKE :searchKeyword";
+            $parameters[':searchKeyword'] = '%' . $searchKeyword . '%';
         }
+
+        if ($selectedCategoryId !== '') {
+            $sql .= " AND category_id = :categoryId";
+            $parameters[':categoryId'] = $selectedCategoryId;
+        }
+
+        if ($status === 'complete') {
+            $sql .= " AND status = 1";
+        } elseif ($status === 'incomplete') {
+            $sql .= " AND status = 0";
+        }
+
+        if ($order === 'old') {
+            $sql .= " ORDER BY deadline ASC";
+        } else {
+            $sql .= " ORDER BY deadline DESC";
+        }
+
+        $stmt = $this->pdo->prepare($sql);
+        foreach ($parameters as $key => $val) {
+            $stmt->bindValue($key, $val);
+        }
+
+        $stmt->execute();
         return $stmt->fetchAll(PDO::FETCH_ASSOC);
     }
 }

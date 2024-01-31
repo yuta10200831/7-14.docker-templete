@@ -34,5 +34,14 @@ final class CategoryDao
         $stmt->execute();
         return (int)$this->pdo->lastInsertId();
     }
+
+    public function findAll(): array
+    {
+        $stmt = $this->pdo->prepare("SELECT * FROM categories");
+        $stmt->execute();
+        $categories = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
+        return $categories;
+    }
 }
 ?>

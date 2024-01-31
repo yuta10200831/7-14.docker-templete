@@ -28,8 +28,8 @@ class TaskQueryService implements ITaskQuery {
         );
     }
 
-    public function findAllTasks(): array {
-        $tasksData = $this->taskDao->findAllTasks();
+    public function findAllTasks($searchKeyword = '', $selectedCategoryId = '', $status = '', $order = 'new'): array {
+        $tasksData = $this->taskDao->findAllTasks($searchKeyword, $selectedCategoryId, $status, $order);
         $tasks = [];
 
         foreach ($tasksData as $taskData) {
