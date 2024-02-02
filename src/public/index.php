@@ -1,4 +1,5 @@
 <?php
+
 session_start();
 require_once __DIR__ . '/../vendor/autoload.php';
 
@@ -16,7 +17,7 @@ use App\Infrastructure\Dao\CategoryDao;
 
 // ログインチェック
 if (!isset($_SESSION['user']['name'])) {
-    header('Location: login.php');
+    header('Location: user/signin.php');
     exit;
 }
 
@@ -29,15 +30,20 @@ if (!isset($_SESSION['user']['id'])) {
 try {
     $search = $_GET['search'] ?? '';
     $deadline = $_GET['deadline'] ?? '2020-01-01';
-    $categoryId = $_GET['category_id'] ?? 1;
+    $categoryId = $_GET['category_id'] ?? '';
+    $status = $_GET['status'] ?? '';
+    $order = $_GET['order'] ?? 'new';
 
     $taskDao = new TaskDao();
     $taskQueryService = new TaskQueryService($taskDao);
     $taskInput = new TaskInput(
         new SearchKeyword($search),
         new Deadline($deadline),
-        new CategoryId($categoryId)
+        new CategoryId($categoryId),
+        $status,
+        $order
     );
+
     $taskInteractor = new TaskInteractor($taskInput, $taskQueryService);
     $taskOutput = $taskInteractor->handle();
     $tasks = $taskOutput->getTasks();
@@ -105,7 +111,7 @@ try {
         </div>
 
         <!-- カテゴリ検索 -->
-        <select name="category" class="p-2 border rounded">
+        <select name="category_id" class="p-2 border rounded">
           <option value="">カテゴリ</option>
           <?php
                 foreach ($categories as $category): ?>

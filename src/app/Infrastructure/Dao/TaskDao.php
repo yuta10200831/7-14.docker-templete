@@ -75,7 +75,10 @@ class TaskDao {
             $stmt->bindValue($key, $val);
         }
 
-        $stmt->execute();
+        if (!$stmt->execute()) {
+            throw new Exception('SQL実行エラー');
+        }
+
         return $stmt->fetchAll(PDO::FETCH_ASSOC);
     }
 }

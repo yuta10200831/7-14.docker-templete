@@ -10,15 +10,18 @@ class TaskInput {
     private $searchKeyword;
     private $deadline;
     private $categoryId;
+    private $status;
+    private $order;
 
-    public function __construct(SearchKeyword $searchKeyword, Deadline $deadline, CategoryId $categoryId) {
-
+    public function __construct(SearchKeyword $searchKeyword, Deadline $deadline, CategoryId $categoryId, string $status = '', string $order = 'new') {
         $this->searchKeyword = $searchKeyword;
         $this->deadline = $deadline;
         $this->categoryId = $categoryId;
+        $this->status = $status;
+        $this->order = $order;
     }
 
-    public function getContents(): SearchKeyword {
+    public function getSearchKeyword(): SearchKeyword {
         return $this->searchKeyword;
     }
 
@@ -28,5 +31,13 @@ class TaskInput {
 
     public function getCategoryId(): CategoryId {
         return $this->categoryId;
+    }
+
+    public function getStatus() {
+        return $this->status;
+    }
+
+    public function getOrder() {
+        return $this->order;
     }
 }

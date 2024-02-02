@@ -17,7 +17,15 @@ final class TaskInteractor {
 
     public function handle(): TaskOutput {
         try {
-            $tasks = $this->taskQuery->findAllTasks();
+            $searchKeywordVo = $this->input->getSearchKeyword();
+            $searchKeyword = $searchKeywordVo->value();
+            $selectedCategoryIdVo = $this->input->getCategoryId();
+            $selectedCategoryId = $selectedCategoryIdVo->getValue();
+            $status = $this->input->getStatus();
+            $order = $this->input->getOrder();
+
+            $tasks = $this->taskQuery->findAllTasks($searchKeyword, $selectedCategoryId, $status, $order);
+
             return new TaskOutput(true, "タスクの一覧を取得しました。", $tasks);
         } catch (\Exception $exception) {
             return new TaskOutput(false, "タスクの一覧取得に失敗しました: " . $exception->getMessage());
