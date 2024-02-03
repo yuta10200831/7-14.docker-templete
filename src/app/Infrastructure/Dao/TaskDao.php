@@ -53,7 +53,7 @@ class TaskDao {
             $parameters[':searchKeyword'] = '%' . $searchKeyword . '%';
         }
 
-        if ($selectedCategoryId !== '') {
+        if ($selectedCategoryId !== '' && is_numeric($selectedCategoryId) && $selectedCategoryId > 0) {
             $sql .= " AND category_id = :categoryId";
             $parameters[':categoryId'] = $selectedCategoryId;
         }

@@ -20,7 +20,10 @@ final class TaskInteractor {
             $searchKeywordVo = $this->input->getSearchKeyword();
             $searchKeyword = $searchKeywordVo->value();
             $selectedCategoryIdVo = $this->input->getCategoryId();
-            $selectedCategoryId = $selectedCategoryIdVo->getValue();
+            $selectedCategoryId = null;
+            if ($selectedCategoryIdVo !== null && $selectedCategoryIdVo->isValid()) {
+                $selectedCategoryId = $selectedCategoryIdVo->getValue();
+            }
             $status = $this->input->getStatus();
             $order = $this->input->getOrder();
 

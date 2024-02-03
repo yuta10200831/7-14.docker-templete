@@ -47,7 +47,6 @@ try {
     $taskInteractor = new TaskInteractor($taskInput, $taskQueryService);
     $taskOutput = $taskInteractor->handle();
     $tasks = $taskOutput->getTasks();
-
     $categoryDao = new CategoryDao();
     $categories = $categoryDao->findAll();
     $categoryMap = [];

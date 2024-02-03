@@ -19,4 +19,3 @@ class CategoryId {
         return $this->isValid;
     }
 }
-?>
