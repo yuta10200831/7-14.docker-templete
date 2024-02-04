@@ -30,4 +30,8 @@ final class CategoryReadOutput
     {
         return $this->message;
     }
+
+    public function getCategoriesWithUsage(): array {
+        return $this->categories;
+    }
 }

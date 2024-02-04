@@ -3,7 +3,6 @@ namespace App\UseCase\UseCaseInteractor;
 
 use App\UseCase\UseCaseInput\CategoryReadInput;
 use App\UseCase\UseCaseOutput\CategoryReadOutput;
-use App\Infrastructure\Dao\CategoryDao;
 use App\Domain\Port\ICategoryQuery;
 
 class CategoryReadInteractor {
@@ -16,8 +15,17 @@ class CategoryReadInteractor {
     }
 
     public function handle(): CategoryReadOutput {
-      $categories = $this->categoryQuery->findAll();
+        $categories = $this->categoryQuery->findAll();
+        $categoriesWithUsage = [];
 
-      return new CategoryReadOutput(true, $categories, "カテゴリ取得成功");
-  }
+        foreach ($categories as $category) {
+            $isInUse = $this->categoryQuery->isCategoryInUse($category['id']);
+            $categoriesWithUsage[] = [
+                'category' => $category,
+                'isInUse' => $isInUse
+            ];
+        }
+
+        return new CategoryReadOutput(true, $categoriesWithUsage, "カテゴリ取得成功");
+    }
 }

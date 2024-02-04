@@ -68,24 +68,26 @@ try {
     </form>
 
     <ul class="divide-y divide-gray-200">
-      <?php foreach ($categories as $category): ?>
+      <?php foreach ($categories as $data): ?>
+      <?php $category = $data['category']; ?>
+      <?php $isInUse = $data['isInUse']; ?>
       <li class="py-2 flex justify-between items-center">
         <span><?php echo htmlspecialchars($category['name'], ENT_QUOTES, 'UTF-8'); ?></span>
         <div>
+          <?php if (!$isInUse): ?>
           <!-- 編集ボタン -->
           <a href="/category/edit.php?id=<?php echo $category['id']; ?>"
             class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-1 px-2 rounded">
             編集
           </a>
-
-          <?php if (!$category_usage[$category['id']]): ?>
           <!-- 削除ボタン -->
           <a href="/category/delete.php?id=<?php echo $category['id']; ?>"
             class="bg-red-500 hover:bg-red-700 text-white font-bold py-1 px-2 rounded">
             削除
           </a>
           <?php else: ?>
-          <span class="text-red-500">現在タスクで使用されているので削除できません</span>
+          <!-- 使用中の文言を赤文字で表示 -->
+          <span class="text-red-500">使用中</span>
           <?php endif; ?>
         </div>
       </li>

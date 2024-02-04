@@ -51,4 +51,13 @@ final class CategoryDao
         $stmt->execute();
         return $stmt->fetchAll(PDO::FETCH_ASSOC);
     }
+
+    public function isCategoryInUse(int $categoryId): bool {
+        $sql = "SELECT COUNT(*) FROM tasks WHERE category_id = :category_id";
+        $stmt = $this->pdo->prepare($sql);
+        $stmt->bindParam(':category_id', $categoryId, PDO::PARAM_INT);
+        $stmt->execute();
+        $count = $stmt->fetchColumn();
+        return $count > 0;
+    }
 }

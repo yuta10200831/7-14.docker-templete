@@ -14,4 +14,8 @@ class CategoryQueryService implements ICategoryQuery {
     public function findAll(): array {
         return $this->categoryDao->findAll();
     }
+
+    public function isCategoryInUse(int $categoryId): bool {
+        return $this->categoryDao->isCategoryInUse($categoryId);
+    }
 }
