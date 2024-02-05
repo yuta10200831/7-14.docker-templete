@@ -81,4 +81,16 @@ class TaskDao {
 
         return $stmt->fetchAll(PDO::FETCH_ASSOC);
     }
+
+    public function updateTask(Task $task): bool {
+        $sql = "UPDATE tasks SET contents = :contents, deadline = :deadline, status = :status, category_id = :category_id WHERE id = :id";
+        $stmt = $this->pdo->prepare($sql);
+        $stmt->bindValue(':id', $task->getId(), PDO::PARAM_INT);
+        $stmt->bindValue(':contents', $task->getContents(), PDO::PARAM_STR);
+        $stmt->bindValue(':deadline', $task->getDeadline()->format('Y-m-d'), PDO::PARAM_STR);
+        $stmt->bindValue(':status', $task->getStatus(), PDO::PARAM_INT);
+        $stmt->bindValue(':category_id', $task->getCategoryId(), PDO::PARAM_INT);
+
+        return $stmt->execute();
+    }
 }
