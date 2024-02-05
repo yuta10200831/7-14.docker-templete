@@ -1,8 +1,6 @@
 <?php
-
 namespace App\UseCase\UseCaseInteractor;
 require_once __DIR__ . '/../../../vendor/autoload.php';
-
 use App\Domain\ValueObject\User\UserName;
 use App\Domain\ValueObject\User\Email;
 use App\Domain\ValueObject\User\InputPassword;
@@ -18,7 +16,6 @@ final class SignupInteractor {
     private $userCommand;
     private $userQuery;
     private $input;
-
     public function __construct(SignUpInput $input, IUserCommand $userCommand, IUserQuery $userQuery) {
         $this->input = $input;
         $this->userCommand = $userCommand;
