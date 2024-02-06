@@ -60,4 +60,30 @@ final class CategoryDao
         $count = $stmt->fetchColumn();
         return $count > 0;
     }
+
+    public function findById(int $id): ?array
+{
+    $stmt = $this->pdo->prepare("SELECT * FROM categories WHERE id = :id");
+    $stmt->bindParam(':id', $id, PDO::PARAM_INT);
+    $stmt->execute();
+    $category = $stmt->fetch(PDO::FETCH_ASSOC);
+
+    return $category ?: null;
+}
+
+    public function update(Category $category): bool
+    {
+        $sql = "UPDATE categories SET name = :name, user_id = :user_id WHERE id = :id";
+        $stmt = $this->pdo->prepare($sql);
+
+        $name = $category->getName()->getValue();
+        $userId = $category->getUserId()->value();
+        $id = $category->getId();
+
+        $stmt->bindParam(':name', $name, PDO::PARAM_STR);
+        $stmt->bindParam(':user_id', $userId, PDO::PARAM_INT);
+        $stmt->bindParam(':id', $id, PDO::PARAM_INT);
+
+        return $stmt->execute();
+    }
 }

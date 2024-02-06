@@ -1,4 +1,5 @@
 <?php
+
 namespace App\UseCase\UseCaseInput;
 
 use App\Domain\ValueObject\User\UserId;
