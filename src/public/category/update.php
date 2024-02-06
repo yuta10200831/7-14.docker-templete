@@ -1,21 +1,45 @@
 <?php
+session_start();
+require_once __DIR__ . '/../../vendor/autoload.php';
 
-$id = $_POST['id'] ?? null;
-$name = $_POST['name'] ?? null;
+use App\Domain\ValueObject\Category\CategoryName;
+use App\Domain\ValueObject\User\UserId;
+use App\UseCase\UseCaseInput\CategoryEditInput;
+use App\Infrastructure\Dao\CategoryDao;
+use App\Adapter\Repository\CategoryRepository;
+use App\UseCase\UseCaseInteractor\CategoryEditInteractor;
 
-if ($id === null || empty($name)) {
-  $errorMessage = empty($name) ? 'カテゴリ名が入力されていません' : '入力されていない項目があります';
-  header('Location: /category/edit.php?id=' . $id . '&error=' . urlencode($errorMessage));
-  exit;
+// ユーザー認証の確認
+if (!isset($_SESSION['user']['name'])) {
+    header('Location: user/signin.php');
+    exit;
 }
 
-$pdo = new PDO('mysql:host=mysql; dbname=todo; charset=utf8', 'root', 'password');
+$id = $_POST['id'] ?? null;
+$name = $_POST['name'] ?? '';
+$userIdValue = $_SESSION['user']['id'] ?? null;
 
-$stmt = $pdo->prepare("UPDATE categories SET name = :name WHERE id = :id");
-$stmt->bindParam(':id', $id, PDO::PARAM_INT);
-$stmt->bindParam(':name', $name, PDO::PARAM_STR);
-$stmt->execute();
+if (is_null($userIdValue) || is_null($id) || empty($name)) {
+    $_SESSION['errors'] = 'カテゴリ名を入力してください。';
+    header("Location: edit.php?id=" . urlencode($id));
+    exit;
+}
 
-header('Location: /category/index.php');
-exit;
-?>
+try {
+    $categoryName = new CategoryName($name);
+    $userId = new UserId((int)$userIdValue);
+    $input = new CategoryEditInput($categoryName, $userId, (int)$id);
+
+    $categoryDao = new CategoryDao();
+    $categoryRepository = new CategoryRepository($categoryDao);
+
+    $categoryEditInteractor = new CategoryEditInteractor($input, $categoryRepository);
+    $output = $categoryEditInteractor->handle();
+
+    header('Location: index.php');
+    exit;
+} catch (Exception $e) {
+    $_SESSION['errors'] = $e->getMessage();
+    header("Location: edit.php?id=" . urlencode($id));
+    exit;
+}

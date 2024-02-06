@@ -25,4 +25,3 @@ final class UserId
         return $value < self::MIN_VALUE;
     }
 }
-?>
