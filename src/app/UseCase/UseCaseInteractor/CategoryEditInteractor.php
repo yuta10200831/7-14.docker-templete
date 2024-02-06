@@ -29,7 +29,6 @@ class CategoryEditInteractor
             if (!$category) {
                 return new CategoryEditOutput(false, "指定されたカテゴリが見つかりません。");
             }
-
             $category->categoryName = $categoryName;
             $category->userId = $userId;
 
