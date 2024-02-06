@@ -31,4 +31,3 @@ class Category {
         return $this->userId;
     }
 }
-?>

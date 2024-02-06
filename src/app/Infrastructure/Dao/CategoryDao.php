@@ -43,5 +43,21 @@ final class CategoryDao
 
         return $categories;
     }
+
+    public function findAllByUserId(int $userId): array {
+        $sql = "SELECT * FROM categories WHERE user_id = :user_id";
+        $stmt = $this->pdo->prepare($sql);
+        $stmt->bindParam(':user_id', $userId, PDO::PARAM_INT);
+        $stmt->execute();
+        return $stmt->fetchAll(PDO::FETCH_ASSOC);
+    }
+
+    public function isCategoryInUse(int $categoryId): bool {
+        $sql = "SELECT COUNT(*) FROM tasks WHERE category_id = :category_id";
+        $stmt = $this->pdo->prepare($sql);
+        $stmt->bindParam(':category_id', $categoryId, PDO::PARAM_INT);
+        $stmt->execute();
+        $count = $stmt->fetchColumn();
+        return $count > 0;
+    }
 }
-?>
