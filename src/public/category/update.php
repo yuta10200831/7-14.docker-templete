@@ -21,7 +21,7 @@ $name = $_POST['name'] ?? '';
 $userIdValue = $_SESSION['user']['id'] ?? null;
 
 if (is_null($userIdValue) || is_null($id) || empty($name)) {
-    $_SESSION['errors'] = 'カテゴリ名を入力してください。';
+    $_SESSION['errors'] = ['カテゴリ名を入力してください。'];
     header("Location: edit.php?id=" . urlencode($id));
     exit;
 }
