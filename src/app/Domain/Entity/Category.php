@@ -27,7 +27,15 @@ class Category {
         return $this->name;
     }
 
+    public function setName(CategoryName $name) {
+        $this->name = $name;
+    }
+
     public function getUserId(): UserId {
         return $this->userId;
+    }
+
+    public function setUserId(UserId $userId) {
+        $this->userId = $userId;
     }
 }
