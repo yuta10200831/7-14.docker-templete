@@ -4,6 +4,7 @@ require_once __DIR__ . '/../../vendor/autoload.php';
 
 use App\Domain\ValueObject\Category\CategoryName;
 use App\Domain\ValueObject\User\UserId;
+use App\Domain\ValueObject\Category\CategoryId;
 use App\UseCase\UseCaseInput\CategoryEditInput;
 use App\Infrastructure\Dao\CategoryDao;
 use App\Adapter\Repository\CategoryRepository;
@@ -20,7 +21,7 @@ $name = $_POST['name'] ?? '';
 $userIdValue = $_SESSION['user']['id'] ?? null;
 
 if (is_null($userIdValue) || is_null($id) || empty($name)) {
-    $_SESSION['errors'] = 'カテゴリ名を入力してください。';
+    $_SESSION['errors'] = ['カテゴリ名を入力してください。'];
     header("Location: edit.php?id=" . urlencode($id));
     exit;
 }

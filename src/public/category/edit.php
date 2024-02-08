@@ -24,10 +24,9 @@ if (!$category) {
     exit;
 }
 
-$errors = $_SESSION['errors'] ?? '';
+$errors = $_SESSION['errors'] ?? [];
 unset($_SESSION['errors']);
 ?>
-
 
 <!DOCTYPE html>
 <html>
@@ -42,12 +41,15 @@ unset($_SESSION['errors']);
     <h1 class="text-3xl mb-4 text-center">カテゴリ編集</h1>
 
     <!-- エラーメッセージがあれば表示 -->
-    <?php if ($error): ?>
-    <p class="text-red-500"><?php echo htmlspecialchars(urldecode($error), ENT_QUOTES, 'UTF-8'); ?></p>
+    <?php if (!empty($_SESSION['errors']) && is_array($_SESSION['errors'])): ?>
+    <?php foreach ($_SESSION['errors'] as $error): ?>
+    <p class="text-red-500"><?php echo htmlspecialchars($error, ENT_QUOTES, 'UTF-8'); ?></p>
+    <?php endforeach; ?>
+    <?php unset($_SESSION['errors']); ?>
     <?php endif; ?>
 
     <form action="update.php" method="post" class="mb-4">
-      <input type="hidden" name="id" value="<?php echo htmlspecialchars($id, ENT_QUOTES, 'UTF-8'); ?>">
+      <input type="hidden" name="id" value="<?php echo htmlspecialchars($categoryId, ENT_QUOTES, 'UTF-8'); ?>">
       <input type="text" name="name" placeholder="カテゴリー名"
         value="<?php echo htmlspecialchars($category['name'], ENT_QUOTES, 'UTF-8'); ?>"
         class="px-4 py-2 border rounded flex-grow">

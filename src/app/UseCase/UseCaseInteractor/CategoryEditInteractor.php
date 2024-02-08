@@ -13,31 +13,31 @@ class CategoryEditInteractor
 
     public function __construct(CategoryEditInput $input, ICategoryEditCommand $iCategoryEditCommand)
     {
-      $this->input = $input;
-      $this->iCategoryEditCommand = $iCategoryEditCommand;
+        $this->input = $input;
+        $this->iCategoryEditCommand = $iCategoryEditCommand;
     }
 
     public function handle(): CategoryEditOutput
     {
-        try {
-            $id = $this->input->getId();
-            $categoryName = $this->input->getName();
-            $userId = $this->input->getUserId();
+        $id = $this->input->getId();
+        $categoryName = $this->input->getName();
+        $userId = $this->input->getUserId();
 
-            $category = $this->iCategoryEditCommand->findById($id);
+        $categoryData = $this->iCategoryEditCommand->findById($id);
 
-            if (!$category) {
-                return new CategoryEditOutput(false, "指定されたカテゴリが見つかりません。");
-            }
+        if (!$categoryData) {
+            return new CategoryEditOutput(false, "指定されたカテゴリが見つかりません。");
+        }
 
-            $category->categoryName = $categoryName;
-            $category->userId = $userId;
+        $category = new Category($categoryName, $userId);
+        $category->setId($id);
 
-            $result = $this->iCategoryEditCommand->update($category);
+        $result = $this->iCategoryEditCommand->update($category);
 
+        if ($result) {
             return new CategoryEditOutput(true, "カテゴリが正常に編集されました");
-        } catch (\Exception $e) {
-            return new CategoryEditOutput(false, "カテゴリの編集に失敗しました: " . $e->getMessage());
+        } else {
+            return new CategoryEditOutput(false, "カテゴリの編集に失敗しました");
         }
     }
 }
